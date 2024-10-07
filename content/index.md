@@ -1,5 +1,5 @@
 ---
-title: Welcome to Matthew's Website
+title: Welcome to my site!
 ---
 
 ![[images/profile.jpg|200x200]]
