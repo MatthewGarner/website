@@ -26,6 +26,15 @@ export const defaultContentPageLayout: PageLayout = {
     Component.MobileOnly(Component.Spacer()),
     Component.Search(),
     Component.Darkmode(),
+    Component.DesktopOnly(
+      Component.RecentNotes({
+        title: "Recent Writing",
+        limit: 3,
+        filter: (f) =>
+          f.slug!.startsWith("posts/") && f.slug! !== "posts/index" && !f.frontmatter?.noindex,
+        linkToMore: "posts/" as SimpleSlug,
+      }),
+    ),
     Component.DesktopOnly(Component.Explorer()),
   ],
   right: [
