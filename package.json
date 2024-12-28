@@ -62,7 +62,7 @@
     "mermaid": "^11.4.1",
     "micromorph": "^0.4.5",
     "pixi.js": "^8.5.2",
-    "preact": "^10.24.3",
+    "preact": "^10.25.4",
     "preact-render-to-string": "^6.5.11",
     "pretty-bytes": "^6.1.1",
     "pretty-time": "^1.1.0",
