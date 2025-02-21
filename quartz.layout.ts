@@ -36,7 +36,7 @@ export const defaultContentPageLayout: PageLayout = {
         linkToMore: "posts/" as SimpleSlug,
       }),
     ),
-    Component.DesktopOnly(Component.Explorer()),
+    Component.Explorer(),
   ],
   right: [
     //Component.Graph(),
