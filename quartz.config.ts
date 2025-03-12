@@ -24,9 +24,9 @@ const config: QuartzConfig = {
       fontOrigin: "googleFonts",
       cdnCaching: true,
       typography: {
-        header: "Kiwi Maru",
-        body: "Kiwi Maru",
-        code: "Kiwi Maru",
+        header: "IBM Plex Mono",
+        body: "IBM Plex Mono",
+        code: "IBM Plex Mono",
       },
       colors: {
         lightMode: {
