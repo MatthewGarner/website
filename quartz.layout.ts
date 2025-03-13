@@ -36,7 +36,6 @@ export const defaultContentPageLayout: PageLayout = {
         linkToMore: "posts/" as SimpleSlug,
       }),
     ),
-    Component.Explorer(),
   ],
   right: [
     //Component.Graph(),
@@ -60,16 +59,8 @@ export const defaultListPageLayout: PageLayout = {
   left: [
     Component.PageTitle(),
     Component.MobileOnly(Component.Spacer()),
-    Component.Flex({
-      components: [
-        {
-          Component: Component.Search(),
-          grow: true,
-        },
-        { Component: Component.Darkmode() },
-      ],
-    }),
-    Component.Explorer(),
+    Component.Search(),
+    Component.Darkmode(),
   ],
   right: [],
 }
