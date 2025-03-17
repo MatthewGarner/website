@@ -1,5 +1,5 @@
 ---
-title: Welcome to my site
+title: Hello there
 ---
 
 ![[images/profile.jpg|200x200]]
