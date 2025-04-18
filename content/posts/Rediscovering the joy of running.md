@@ -1,7 +1,6 @@
 ---
 draft: false
 date: 2025-04-06
-tags: 
 title: Rediscovering the joy of running
 ---
 A chilly and illness-peppered winter was not the ideal lead-up to what was supposed to my first crack at a Marathon (in [Paris](https://www.schneiderelectricparismarathon.com/en/)).
