@@ -4,7 +4,7 @@ title: Hello there
 
 ![[images/profile.jpg|200x200]]
 
-Hey! I'm Matthew. I currently work as a Lead Product Manager at [Field](https://www.field.energy/) building out essential renewable energy infrastructure.
+Hey! I'm Matthew. I currently work as a Lead Product Manager at [Field](https://www.field.energy/) building out essential renewable energy infrastructure in GB and beyond.
 
 Previously, I've worked at [Bulb](https://en.wikipedia.org/wiki/Bulb_Energy) and [Cuckoo](https://www.cuckoo.co/).
 
