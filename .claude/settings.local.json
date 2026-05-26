@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/matthew/repos/website ls-files .quartz/plugins/og-image/dist/)",
+      "Bash(git -C /Users/matthew/repos/website check-ignore -v .quartz/plugins/og-image/dist/index.js)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts', {}\\), indent=2\\)\\)\")",
+      "Bash(git -C /Users/matthew/repos/website ls-files .quartz/)"
+    ]
+  }
+}
