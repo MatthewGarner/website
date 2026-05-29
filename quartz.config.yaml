@@ -13,7 +13,6 @@ configuration:
     - templates
     - .obsidian
   theme:
-    fontOrigin: googleFonts
     cdnCaching: true
     typography:
       header: Schibsted Grotesk
@@ -144,11 +143,16 @@ plugins:
   - source: github:quartz-community/content-page
     enabled: true
   - source: github:quartz-community/folder-page
-    enabled: true
+    enabled: false
   - source: github:quartz-community/tag-page
-    enabled: true
+    enabled: false
   - source: github:quartz-community/explorer
     enabled: true
+    options: 
+      title: My Posts
+      folderClickBehavior: collapse
+      folderDefaultState: open
+      showTags: false
     layout:
       position: left
       priority: 50
@@ -224,6 +228,11 @@ plugins:
         Discord Community: https://discord.gg/cRFFHYye7t
   - source: github:quartz-community/recent-notes
     enabled: true
+    options:
+      showTags: false
+    layout:
+      position: afterBody
+      priority: 60
   - source: github:quartz-community/spacer
     enabled: true
     options: {}
