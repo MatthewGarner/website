@@ -230,11 +230,11 @@ plugins:
       position: afterBody
       priority: 10
   - source: github:quartz-community/footer
-    enabled: false
+    enabled: true
     options:
       links:
-        GitHub: https://github.com/jackyzha0/quartz
-        Discord Community: https://discord.gg/cRFFHYye7t
+        GitHub: https://github.com/matthewgarner
+        My Toolkit: https://tools.matthewgarner.me
   - source: github:quartz-community/recent-notes
     enabled: true
     options:
