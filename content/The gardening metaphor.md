@@ -2,6 +2,8 @@
 title: The gardening metaphor
 draft: false
 date: 2025-03-17
+aliases:
+  - posts/the-gardening-metaphor
 ---
 I admit it - I'm a hoarder. A digital hoarder. I have more books in my kindle library than I'm likely to ever read, more articles saved in [Reader](https://readwise.io/read) than you'd need to fill a decade's worth of newspapers. I like it. I like *having* stuff there *in case I need it* and ohhhhh surely I will need those 10 articles about why *BigTechCorp* is so right/wrong with the latest new product, societal issue or anything else. I've got research papers about how LLMs work that felt important but I'm pretty sure they'll always stay somewhere lower down the list.
 

@@ -1,7 +1,33 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
-
 .explorer .explorer-content ul.explorer-ul li > a:before {
   display: none;
+}
+
+.tools-sibling-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--lightgray);
+  color: var(--darkgray);
+  font-size: 0.85rem;
+  line-height: 1.35;
+
+  &:hover {
+    color: var(--secondary);
+  }
+
+  .tools-sibling-kicker {
+    grid-column: 1 / -1;
+    color: var(--gray);
+    font-family: var(--codeFont);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+  }
+
+  .tools-sibling-arrow {
+    align-self: end;
+  }
 }

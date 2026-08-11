@@ -158,7 +158,7 @@ plugins:
   - source: github:quartz-community/explorer
     enabled: true
     options: 
-      title: My Posts
+      title: Writing
       folderClickBehavior: collapse
       folderDefaultState: open
       showTags: false
@@ -234,13 +234,18 @@ plugins:
     options:
       links:
         GitHub: https://github.com/matthewgarner
-        My Toolkit: https://tools.matthewgarner.me
+        Tools: https://tools.matthewgarner.me
   - source: github:quartz-community/recent-notes
     enabled: true
     options:
       showTags: false
     layout:
       position: afterBody
+      priority: 60
+  - source: ./plugins/tools-sibling-link
+    enabled: true
+    layout:
+      position: left
       priority: 60
   - source: github:quartz-community/spacer
     enabled: true

@@ -2,6 +2,8 @@
 draft: false
 date: 2024-10-21
 title: I'll stay home thanks
+aliases:
+  - posts/ill-stay-home-thanks
 ---
 
 

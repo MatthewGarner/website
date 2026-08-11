@@ -2,6 +2,8 @@
 title: Drifting
 date: 2025-03-15
 draft: false
+aliases:
+  - posts/drifting
 ---
 It's not a new observation but it bears repeating. It's very easy to drift if you don't have a clear intent.
 
