@@ -105,3 +105,9 @@
     align-self: end;
   }
 }
+
+@media all and ($mobile) {
+  .tools-sibling-link {
+    display: none;
+  }
+}
