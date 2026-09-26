@@ -10,10 +10,12 @@
     </header>
     <div class="type-playground">
       <div class="type-sheet" data-paper="cream" data-face="oswald">
+        <div class="type-sheet-content">
         <div class="specimen-caption"><span data-face-name>Oswald</span><span>Type specimen · 01</span></div>
         <label for="specimen-text" class="sr-only">Your words</label>
         <textarea id="specimen-text" maxlength="72" rows="3" spellcheck="false" autocomplete="off" aria-describedby="specimen-hint">{'A little\nroom to think.'}</textarea>
         <p id="specimen-hint">Try typing something of your own.</p>
+        </div>
       </div>
       <div class="type-controls" hidden>
         <fieldset>
@@ -51,51 +53,123 @@
   const content = details.querySelector<HTMLElement>('.colophon-content')!;
   const controls = details.querySelector<HTMLElement>('.type-controls')!;
   const sheet = details.querySelector<HTMLElement>('.type-sheet')!;
+  const sheetContent = details.querySelector<HTMLElement>('.type-sheet-content')!;
+  const intro = details.querySelector<HTMLElement>('.colophon-intro')!;
   const specimen = details.querySelector<HTMLTextAreaElement>('#specimen-text')!;
   const weight = details.querySelector<HTMLInputElement>('#specimen-weight')!;
   const weightValue = details.querySelector<HTMLOutputElement>('#specimen-weight-value')!;
   const faceName = details.querySelector<HTMLElement>('[data-face-name]')!;
   const status = details.querySelector<HTMLElement>('[data-specimen-status]')!;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  const animations = new Set<Animation>();
+  let folds: Animation[] = [];
+  let specimenAnimation: Animation | undefined;
   const phrases = ['A little\nroom to think.', 'Good things\ntake time.', 'Follow your\ncuriosity.', 'Words worth\nkeeping.'];
   let phrase = 0;
+  let desiredOpen = details.open;
   let openingByReader = false;
+  let operation = 0;
 
-  function settle() {
-    animations.forEach(animation => animation.cancel());
-    animations.clear();
+  function stopSpecimen() {
+    specimenAnimation?.cancel();
+    specimenAnimation = undefined;
   }
-  function reveal(element: HTMLElement, distance = 6) {
-    settle();
-    if (motion.matches || typeof element.animate !== 'function') return;
-    const animation = element.animate([
-      { opacity: .5, transform: `translateY(${distance}px)` },
-      { opacity: 1, transform: 'none' },
-    ], { duration: 280, easing: 'cubic-bezier(.22, 1, .36, 1)' });
-    animations.add(animation);
-    void animation.finished.then(() => animations.delete(animation), () => {});
+  function finishFold(scroll = false, behavior: ScrollBehavior = motion.matches ? 'instant' : 'smooth') {
+    operation++;
+    folds.forEach(animation => animation.cancel());
+    folds = [];
+    details.open = desiredOpen;
+    content.inert = !desiredOpen;
+    details.style.removeProperty('overflow');
+    delete details.dataset.fold;
+    // Only an explicit opening may move the footer. Restoring history must preserve its position.
+    if (scroll && openingByReader && desiredOpen && content.getBoundingClientRect().top > innerHeight * .65) {
+      details.scrollIntoView({ block: 'start', behavior });
+    }
+    openingByReader = false;
   }
-  summary.addEventListener('click', () => {
-    openingByReader = !details.open;
+  function revealSpecimen() {
+    stopSpecimen();
+    if (motion.matches || typeof specimen.animate !== 'function') return;
+    specimenAnimation = specimen.animate([
+      { transform: 'translateY(6px)' },
+      { transform: 'none' },
+    ], { duration: 240, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+    void specimenAnimation.finished.catch(() => {});
+  }
+  function fold(open: boolean, byReader = true) {
+    desiredOpen = open;
+    openingByReader = open && byReader;
+    if (!open && content.contains(document.activeElement)) summary.focus({ preventScroll: true });
+    content.inert = !open;
+    stopSpecimen();
+    if (motion.matches || typeof details.animate !== 'function') {
+      finishFold(true);
+      return;
+    }
+    if (!folds.length) {
+      const closedHeight = summary.offsetHeight;
+      details.open = true;
+      const fullHeight = details.offsetHeight;
+      const shadow = getComputedStyle(sheet).boxShadow;
+      const easing = 'cubic-bezier(.22, 1, .36, 1)';
+      const timing = { duration: 480, fill: 'both' as const, easing: 'linear' };
+      // A shared timeline lets another click reverse the current fold without a jump.
+      folds = [
+        details.animate([{ height: `${closedHeight}px` }, { height: `${fullHeight}px` }], { ...timing, easing }),
+        sheet.animate([
+          { transform: 'perspective(900px) rotateX(-64deg)', boxShadow: '2px 12px 14px rgb(20 16 25 / .16)', easing },
+          { transform: 'none', boxShadow: shadow, offset: .72 },
+          { transform: 'none', boxShadow: shadow },
+        ], timing),
+        sheetContent.animate([
+          { clipPath: 'inset(0 0 100% 0)', transform: 'translateY(-8px)' },
+          { clipPath: 'inset(0 0 100% 0)', transform: 'translateY(-8px)', offset: .2, easing },
+          { clipPath: 'inset(0)', transform: 'none' },
+        ], timing),
+        controls.animate([
+          { clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-10px)' },
+          { clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-10px)', offset: .35, easing },
+          { clipPath: 'inset(0)', transform: 'none' },
+        ], timing),
+        intro.animate([{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0)' }], { ...timing, easing }),
+      ];
+      folds.forEach(animation => { animation.currentTime = open ? 0 : 480; });
+    }
+    details.style.overflow = 'hidden';
+    details.dataset.fold = open ? 'opening' : 'closing';
+    const currentOperation = ++operation;
+    folds.forEach(animation => {
+      animation.playbackRate = open ? 1 : -1.5;
+      animation.play();
+      // Both reversal and page lifecycle cleanup can cancel a pending finished promise.
+      void animation.finished.catch(() => {});
+    });
+    void folds[0].finished.then(() => {
+      if (currentOperation === operation) finishFold(true);
+    }, () => {});
+  }
+  summary.addEventListener('click', (event) => {
+    event.preventDefault();
     summary.focus({ preventScroll: true });
+    fold(!desiredOpen);
   });
   details.addEventListener('toggle', () => {
-    if (details.open) {
-      reveal(content, -8);
-      // The footer is often at the viewport edge. Show what the reader just opened,
-      // but do not move a restored page or a disclosure already comfortably in view.
-      if (openingByReader && content.getBoundingClientRect().top > innerHeight * .65) {
-        details.scrollIntoView({ block: 'start', behavior: motion.matches ? 'instant' : 'smooth' });
-      }
+    // Native external changes (including find-in-page) settle immediately, without replaying a fold.
+    if (!details.open && (desiredOpen || folds.length) || details.open && !desiredOpen && !folds.length) {
+      desiredOpen = details.open;
+      if (!desiredOpen && content.contains(document.activeElement)) summary.focus({ preventScroll: true });
+      finishFold();
     }
-    else settle();
-    openingByReader = false;
+  });
+  content.addEventListener('focusin', () => {
+    // Readers can enter the editor immediately; moving or clipped controls must never delay input.
+    // WebKit's native focus scroll can cancel a smooth scroll started inside focusin.
+    if (folds.length && desiredOpen) finishFold(true, 'instant');
   });
   details.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || event.isComposing || !details.open) return;
     event.preventDefault();
-    details.open = false;
+    fold(false);
     summary.focus({ preventScroll: true });
   });
   weight.addEventListener('input', () => {
@@ -105,14 +179,14 @@
   details.querySelectorAll<HTMLInputElement>('input[name="specimen-face"]').forEach(input => input.addEventListener('change', () => {
     sheet.dataset.face = input.value;
     faceName.textContent = input.value === 'oswald' ? 'Oswald' : 'Newsreader';
-    reveal(specimen);
+    revealSpecimen();
   }));
   details.querySelectorAll<HTMLInputElement>('input[name="specimen-paper"]').forEach(input => input.addEventListener('change', () => { sheet.dataset.paper = input.value; }));
   details.querySelector('[data-next-phrase]')!.addEventListener('click', () => {
     phrase = (phrase + 1) % phrases.length;
     specimen.value = phrases[phrase];
     status.textContent = `New phrase: ${phrases[phrase].replace('\n', ' ')}`;
-    reveal(specimen);
+    revealSpecimen();
   });
   details.querySelector('[data-reset-type]')!.addEventListener('click', () => {
     phrase = 0;
@@ -124,12 +198,21 @@
     faceName.textContent = 'Oswald';
     details.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach(input => { input.checked = input.defaultChecked; });
     status.textContent = 'Type specimen reset.';
-    reveal(specimen);
+    revealSpecimen();
   });
   // Safari does not focus buttons on click. Keep subsequent Escape/Tab inside the disclosure.
   details.querySelectorAll<HTMLButtonElement>('button').forEach(button => button.addEventListener('click', () => button.focus({ preventScroll: true })));
-  motion.addEventListener('change', () => { if (motion.matches) settle(); });
+  function settle() {
+    stopSpecimen();
+    finishFold();
+    details.getAnimations?.({ subtree: true }).forEach(animation => animation.cancel());
+  }
+  motion.addEventListener('change', () => { if (motion.matches) { stopSpecimen(); finishFold(true); } });
+  addEventListener('resize', () => { if (folds.length) finishFold(true); });
   addEventListener('pagehide', settle);
+  addEventListener('pageshow', settle);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) settle(); });
+  content.inert = !details.open;
   controls.hidden = false;
 </script>
 <style>
@@ -139,13 +222,14 @@
   .colophon > summary:hover { color: var(--accent); }
   .colophon-toggle { font-family: ui-monospace, monospace; font-size: 23px; line-height: 1; transition: transform 220ms ease; }
   .colophon[open] .colophon-toggle { transform: rotate(45deg); }
+  .colophon[data-fold='closing'] .colophon-toggle { transform: none; }
   .colophon-content { padding: 30px 0 14px; }
   .colophon-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; margin-bottom: 28px; }
   .colophon-label { color: var(--muted); font: 12px/1.4 ui-monospace, monospace; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 12px; }
   .colophon h2 { font-size: 38px; line-height: 1.15; }
   .colophon-intro > p { max-width: 440px; color: var(--muted); font-size: 20px; line-height: 1.45; }
   .type-playground { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 40px; align-items: start; }
-  .type-sheet { --specimen-paper: #faf8f2; --specimen-ink: #24212c; background: var(--specimen-paper); color: var(--specimen-ink); padding: 26px 32px 22px; border: 1px solid var(--line); box-shadow: 4px 5px 0 var(--paper), 5px 6px 0 var(--line); transition: background-color 220ms ease, color 220ms ease; }
+  .type-sheet { --specimen-paper: #faf8f2; --specimen-ink: #24212c; background: var(--specimen-paper); color: var(--specimen-ink); padding: 26px 32px 22px; border: 1px solid var(--line); box-shadow: 4px 5px 0 var(--paper), 5px 6px 0 var(--line); transform-origin: 50% 0; transition: background-color 220ms ease, color 220ms ease; }
   .type-sheet[data-paper='lilac'] { --specimen-paper: #e4dbee; }
   .type-sheet[data-paper='ink'] { --specimen-paper: #24212c; --specimen-ink: #f4f0e6; }
   .specimen-caption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-bottom: 28px; font: 12px/1.4 ui-monospace, monospace; }

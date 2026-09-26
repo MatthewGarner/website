@@ -6,6 +6,7 @@ import '../styles/global.css';
 import circleHalf from '@phosphor-icons/core/assets/fill/circle-half-fill.svg?raw';
 import ReadingTransition from '../components/ReadingTransition.astro';
 import Colophon from '../components/Colophon.astro';
+import HomeArrival from '../components/HomeArrival.astro';
 interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; }
 const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false } = Astro.props;
 const pageTitle = title ? `${title} — Matthew Garner` : 'Matthew Garner';
@@ -17,6 +18,7 @@ const current = Astro.url.pathname;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {current === '/' && <HomeArrival />}
     {(article || current === '/') && <ReadingTransition />}
     <script is:inline>
       (() => {

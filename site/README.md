@@ -91,6 +91,7 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 | About heading, biography and portrait reference | `content/index.md` |
 | Homepage introduction and Tools link | [src/pages/index.astro](src/pages/index.astro) |
 | Homepage headline and its pointer/touch response | [src/components/ResponsiveHeadline.astro](src/components/ResponsiveHeadline.astro) |
+| Homepage entrance and opening paper fan | [src/components/HomeArrival.astro](src/components/HomeArrival.astro) |
 | Reading marker and the article end mark | [src/components/ReadingDetails.astro](src/components/ReadingDetails.astro) |
 | “About this site” and its typography playground | [src/components/Colophon.astro](src/components/Colophon.astro) |
 | Site name, navigation, footer links, default description and theme toggle | [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) |
@@ -105,11 +106,13 @@ The colour variables at the top of `global.css` define light mode; `:root[data-t
 
 Appearance follows the reader’s system until they toggle it, then remembers their choice. After a visual change, check both themes, a narrow screen, keyboard focus and the article preview interaction. Keep the reduced-motion behaviour when editing transitions.
 
+On a fresh homepage visit, the headline arrives line by line, the introduction follows, the section rules draw and the paper stack briefly fans apart. The sequence finishes within a second and runs once per tab session; returning through site navigation, Back or a section link keeps the page still. Clicking, typing or scrolling settles it immediately. To see it again, open the homepage directly in a new tab.
+
 The headline responds to the pointer and ripples on a touch tap, then rests. Paper previews lift into place and expand into an article alongside its title. Clicking Appearance reveals the new theme from the icon; automatic system changes use a quiet crossfade. Reduced motion keeps everything still. These effects add no authoring requirements or animation dependencies.
 
 Navigation, article titles and footer links draw an underline on hover or keyboard focus; directional arrows move slightly with them. Ordinary links in the writing retain their visible underlines. Longer pieces gain a small marker in the desktop margin, or a fine line at the top on smaller screens. It measures only the prose, appears when that prose exceeds one and a half screen heights, and updates after images, fonts or screen sizes change. A short end mark draws once on reaching the article ending, followed by **Keep reading** settling into place. Reduced motion hides the optional marker and leaves a static ending; print omits both. No extra Markdown properties are needed.
 
-**About this site** in the footer opens a small typography playground. Readers can edit the specimen, choose Oswald or Newsreader, adjust its weight and change its paper colour. **Another phrase** cycles the phrases defined in `Colophon.astro`; **Reset** restores the defaults. These changes stay within the specimen and are neither saved nor sent anywhere. Escape closes the panel. Without JavaScript, the site note and editable specimen still work; reduced motion removes the effects.
+**About this site** in the footer unfolds a small typography playground: the paper opens before its words and controls appear, then folds back on closing. Repeated clicks reverse the movement; entering the editor settles it immediately. Readers can edit the specimen, choose Oswald or Newsreader, adjust its weight and change its paper colour. **Another phrase** cycles the phrases defined in `Colophon.astro`; **Reset** restores the defaults. These changes stay within the specimen and are neither saved nor sent anywhere. Escape closes the panel and returns focus to its heading. Without JavaScript, the site note and editable specimen still work; reduced motion removes the effects.
 
 ### Reading interactions and browser checks
 
@@ -124,7 +127,7 @@ npm run test:browser
 
 The suite builds an isolated copy with the reading sample, never adding fixtures to `content/`. It checks keyboard and touch controls, reduced motion, missing features, blocked storage and clipboard access, light/dark contrast, and print output in Chromium and WebKit. GitHub runs it automatically. Print screenshots and the Chromium PDF are written under `site/test-results/`; failed runs retain traces. Physical devices and screen-reader use still benefit from occasional manual checks.
 
-Interaction code lives in `src/components/ResponsiveHeadline.astro`, `ReadingTransition.astro`, `ReadingDetails.astro`, `Footnotes.astro`, `QuotePassage.astro` and `Colophon.astro`, plus `src/scripts/previews.ts` and `appearance.ts`. Link effects, print and shared motion rules live in `src/styles/global.css`.
+Interaction code lives in `src/components/HomeArrival.astro`, `ResponsiveHeadline.astro`, `ReadingTransition.astro`, `ReadingDetails.astro`, `Footnotes.astro`, `QuotePassage.astro` and `Colophon.astro`, plus `src/scripts/previews.ts` and `appearance.ts`. Link effects, print and shared motion rules live in `src/styles/global.css`.
 
 Do not hand-edit `site/dist/`, `site/.assets/`, `site/.astro/` or `.vercel/output/`; builds regenerate them. Publishing rules live in `src/lib/publishing.ts`, Markdown handling in `src/lib/obsidian.ts` and `src/lib/markdown.ts`, and rendering configuration in `astro.config.ts`.
 
