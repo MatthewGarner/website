@@ -6,8 +6,14 @@
     const navigation = performance.getEntriesByType('navigation')[0];
     const reloading = navigation?.type === 'reload';
     const internal = document.referrer && new URL(document.referrer).origin === location.origin;
+    // WebKit can restore scrolling after pageshow. Remember the outgoing entry
+    // before deciding whether a reload should animate, including after Back.
+    const restoringScroll = reloading && history.state?.mgHomeScrolled === true;
+    addEventListener('pagehide', () => {
+      try { history.replaceState({ ...history.state, mgHomeScrolled: scrollY > 0 }, ''); } catch {}
+    });
     // A restored page or a deliberate destination should never run an entrance over the reader's place.
-    if ((internal && !reloading) || navigation?.type === 'back_forward' || location.hash || motion.matches) return;
+    if ((internal && !reloading) || navigation?.type === 'back_forward' || restoringScroll || location.hash || motion.matches) return;
     let shown = !reloading;
     let started = false;
     let finished = false;

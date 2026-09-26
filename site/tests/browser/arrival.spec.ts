@@ -37,7 +37,19 @@ test('Back and a scrolled reload preserve the page without replaying the entranc
   await page.goBack();
   await expect(page.locator('[data-home-arrival]')).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => scrollY)).toBeCloseTo(position, 0);
+  // WebKit can restore scrolling after pageshow. Reproduce that ordering explicitly.
+  await page.evaluate(() => { history.scrollRestoration = 'manual'; });
+  await page.addInitScript(position => {
+    addEventListener('pageshow', () => {
+      setTimeout(() => {
+        scrollTo(0, position);
+        (window as any).scrollRestored = true;
+      }, 150);
+    }, { once: true });
+  }, position);
   await page.reload();
+  await expect.poll(() => page.evaluate(() => (window as any).scrollRestored)).toBe(true);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeCloseTo(position, 0);
   await expect(page.locator('[data-home-arrival]')).toHaveCount(0);
   expect(await page.evaluate(() => (window as any).arrivalAnimations)).toEqual([]);
 });
