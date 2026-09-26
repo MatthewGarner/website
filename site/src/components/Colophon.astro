@@ -73,7 +73,7 @@
     specimenAnimation?.cancel();
     specimenAnimation = undefined;
   }
-  function finishFold(scroll = false) {
+  function finishFold(scroll = false, behavior: ScrollBehavior = motion.matches ? 'instant' : 'smooth') {
     operation++;
     folds.forEach(animation => animation.cancel());
     folds = [];
@@ -83,7 +83,7 @@
     delete details.dataset.fold;
     // Only an explicit opening may move the footer. Restoring history must preserve its position.
     if (scroll && openingByReader && desiredOpen && content.getBoundingClientRect().top > innerHeight * .65) {
-      details.scrollIntoView({ block: 'start', behavior: motion.matches ? 'instant' : 'smooth' });
+      details.scrollIntoView({ block: 'start', behavior });
     }
     openingByReader = false;
   }
@@ -163,7 +163,8 @@
   });
   content.addEventListener('focusin', () => {
     // Readers can enter the editor immediately; moving or clipped controls must never delay input.
-    if (folds.length && desiredOpen) finishFold(true);
+    // WebKit's native focus scroll can cancel a smooth scroll started inside focusin.
+    if (folds.length && desiredOpen) finishFold(true, 'instant');
   });
   details.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || event.isComposing || !details.open) return;
