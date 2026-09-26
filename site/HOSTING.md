@@ -6,9 +6,11 @@ The existing Vercel project is `matthew-garners-projects/my-web-quartz` (`prj_8v
 
 ## Git publishing
 
-Keep the project root at the repository root so Astro can read the sibling `content/` directory. Root `vercel.json` overrides the old dashboard commands: install with `npm ci --prefix site`, then `npm --prefix site run build:release`. Use Node 24. The release command checks types, builds, runs publishing tests and writes `.vercel/output/` at the repository root.
+Keep the project root at the repository root so Astro can read the sibling `content/` directory. Root `vercel.json` overrides the old dashboard commands: install with `npm ci --prefix site`, then `npm --prefix site run build:release`. Use Node 24. The release command checks types, builds, runs publishing tests and writes `.vercel/output/` at the repository root. Astro declares its own Node types: relying on Quartz’s parent `node_modules` passed locally but failed in a clean Vercel build.
 
 Vercel consumes the [Build Output API](https://vercel.com/docs/build-output-api). Only rendered public files enter its static directory; routing supplies permanent article redirects and real 404 responses. The GitHub “Astro publishing” workflow runs the same build. The Vercel build itself runs all checks, so it cannot publish a failed build even if GitHub checks finish later.
+
+This repository retains an upstream Quartz remote. Use `gh --repo MatthewGarner/website` for repository operations; GitHub CLI can otherwise select the upstream repository.
 
 Push a branch to get a protected Vercel preview. Verify it before merging into `v5`:
 
