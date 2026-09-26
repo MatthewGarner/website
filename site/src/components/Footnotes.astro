@@ -14,6 +14,7 @@
     const title = panel.querySelector<HTMLElement>('#footnote-preview-title')!;
     const close = panel.querySelector<HTMLButtonElement>('button')!;
     let reference: HTMLAnchorElement | undefined;
+    let pressedReference: HTMLAnchorElement | undefined;
     let frame = 0;
 
     const dismiss = (restoreFocus = false) => {
@@ -63,7 +64,11 @@
         dismiss(true);
       }
     });
+    // Native light dismissal clears the open reference before the subsequent click.
+    document.addEventListener('pointerdown', () => { pressedReference = reference; }, true);
     document.addEventListener('click', (event) => {
+      const previouslyOpen = pressedReference;
+      pressedReference = undefined;
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const link = (event.target as Element).closest<HTMLAnchorElement>('.prose a[data-footnote-ref]');
       if (!link) return;
@@ -73,7 +78,11 @@
       try { source = document.getElementById(decodeURIComponent(url.hash.slice(1))); } catch { return; }
       if (!source?.closest('.prose [data-footnotes]')) return;
       event.preventDefault();
-      if (reference === link) { dismiss(true); return; }
+      if (reference === link || event.detail > 0 && previouslyOpen === link) {
+        dismiss();
+        link.focus({ preventScroll: true });
+        return;
+      }
       if (reference) dismiss();
       const content = source.cloneNode(true) as HTMLElement;
       content.querySelectorAll('[data-footnote-backref]').forEach((backlink) => backlink.remove());

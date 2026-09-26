@@ -27,10 +27,15 @@ const url = new URL(path, localDraft ? Astro.url.origin : Astro.site).href;
   let passage: { text: string; link: string; range: Range } | undefined;
   let timer: ReturnType<typeof setTimeout>;
   let copying = false;
+  let copyOperation = 0;
   let dismissedRange: Range | undefined;
 
   function close(rememberSelection = false) {
     clearTimeout(timer);
+    // A delayed clipboard response belongs to the selection that requested it.
+    copyOperation++;
+    copying = false;
+    copy.disabled = false;
     if (rememberSelection && passage) dismissedRange = passage.range.cloneRange();
     toolbar.hidden = true;
     manual.hidden = true;
@@ -85,23 +90,28 @@ const url = new URL(path, localDraft ? Astro.url.origin : Astro.site).href;
   });
   copy.addEventListener('click', async () => {
     if (!passage) return;
+    const operation = ++copyOperation;
     const text = `“${passage.text}”\n\n— Matthew Garner, ${toolbar.dataset.quoteTitle}\n${passage.link}`;
     copying = true;
     copy.disabled = true;
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
       await navigator.clipboard.writeText(text);
+      if (operation !== copyOperation) return;
       status.textContent = 'Copied — ready to share.';
     } catch {
+      if (operation !== copyOperation) return;
       manual.hidden = false;
       field.value = text;
       status.textContent = 'Automatic copying is unavailable. Copy the text below.';
       field.focus({ preventScroll: true });
       field.select();
     } finally {
-      copying = false;
-      copy.disabled = false;
-      place();
+      if (operation === copyOperation) {
+        copying = false;
+        copy.disabled = false;
+        place();
+      }
     }
   });
   dismiss.addEventListener('click', () => {
@@ -118,6 +128,7 @@ const url = new URL(path, localDraft ? Astro.url.origin : Astro.site).href;
   addEventListener('scroll', place, { passive: true });
   addEventListener('resize', place);
   window.visualViewport?.addEventListener('resize', place);
+  addEventListener('pagehide', () => close());
 </script>
 <style>
   .quote-actions { position: fixed; z-index: 20; max-width: min(380px, calc(100vw - 24px)); padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); box-shadow: 0 8px 28px #0002; font-size: 18px; }

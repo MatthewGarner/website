@@ -29,18 +29,17 @@ function marker(source: string, delimiter: string, from: number, protectedRanges
 
 /** Remove comments before parsing links or deriving public descriptions, never just with CSS. */
 export function stripComments(source: string): string {
-  const ranges = codeRanges(source);
-  let result = '';
   let cursor = 0;
-  for (let start = marker(source, '%%', cursor, ranges); start !== -1; start = marker(source, '%%', cursor, ranges)) {
+  for (let start = marker(source, '%%', cursor, codeRanges(source)); start !== -1; start = marker(source, '%%', cursor, codeRanges(source))) {
     const end = marker(source, '%%', start + 2);
     if (end === -1) throw new Error('Unclosed Obsidian comment: add a closing %% before publishing.');
-    result += source.slice(cursor, start);
     // Preserve paragraph boundaries, including comments spanning several Markdown blocks.
-    result += source.slice(start, end + 2).replace(/[^\n]/g, '');
-    cursor = end + 2;
+    const lines = source.slice(start, end + 2).replace(/[^\n]/g, '');
+    source = source.slice(0, start) + lines + source.slice(end + 2);
+    cursor = start + lines.length;
+    // Markdown inside a removed comment must not make later comments look like code.
   }
-  return result + source.slice(cursor);
+  return source;
 }
 
 export function prepareMarkdown(source: string): string {

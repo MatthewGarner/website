@@ -10,7 +10,8 @@ import HomeArrival from '../components/HomeArrival.astro';
 interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; }
 const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false } = Astro.props;
 const pageTitle = title ? `${title} — Matthew Garner` : 'Matthew Garner';
-const canonical = new URL(Astro.url.pathname, Astro.site);
+// Directory builds add a slash; public routes redirect to the slashless URL.
+const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '') || '/', Astro.site);
 const current = Astro.url.pathname;
 ---
 <!doctype html>

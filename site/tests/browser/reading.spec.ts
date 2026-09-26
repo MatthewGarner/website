@@ -96,6 +96,53 @@ test('a selected passage copies its text, credit and a specific link', async ({ 
   await expect(toolbar).not.toBeVisible();
 });
 
+test('the same footnote reference toggles its preview with pointer and keyboard input', async ({ page }) => {
+  await page.goto('/interaction-sample');
+  const reference = page.locator('[data-footnote-ref]').first();
+  const panel = page.getByRole('dialog', { name: 'Footnote 1' });
+  await reference.click();
+  await expect(panel).toBeVisible();
+  await reference.click();
+  await expect(panel).not.toBeVisible();
+  await expect(reference).toBeFocused();
+  await reference.press('Enter');
+  await expect(panel).toBeVisible();
+  await reference.focus();
+  await reference.press('Enter');
+  await expect(panel).not.toBeVisible();
+  await expect(reference).toBeFocused();
+});
+
+test('a dismissed clipboard request cannot change a later quotation or steal focus', async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as any).quoteWrites = [];
+    Object.defineProperty(navigator, 'clipboard', { value: {
+      writeText: () => new Promise<void>((resolve, reject) => {
+        (window as any).quoteWrites.push({ resolve, reject });
+      }),
+    } });
+  });
+  await page.goto('/drifting');
+  await selectParagraph(page);
+  const toolbar = page.getByRole('complementary', { name: 'Share selected text' });
+  const copy = page.getByRole('button', { name: 'Copy quote & link' });
+  await copy.click();
+  await expect(copy).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await expect(toolbar).not.toBeVisible();
+  await selectParagraph(page, 1);
+  await expect(toolbar).toBeVisible();
+  await expect(copy).toBeEnabled();
+  await copy.click();
+  await expect(copy).toBeDisabled();
+  await page.evaluate(() => (window as any).quoteWrites[0].reject(new Error('Denied')));
+  await expect(page.getByLabel('Copy this quote')).not.toBeVisible();
+  await expect(page.locator('.quote-status')).toBeEmpty();
+  await expect(copy).toBeDisabled();
+  await page.evaluate(() => (window as any).quoteWrites[1].resolve());
+  await expect(page.locator('.quote-status')).toHaveText('Copied — ready to share.');
+});
+
 test('clipboard denial offers a keyboard-accessible manual copy, including on mobile', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText: async () => { throw new Error('Denied'); } } });
@@ -191,6 +238,12 @@ test('touch previews open one at a time and quote actions fit above the phone ed
   expect(rect.y + rect.height).toBeLessThanOrEqual(844);
   await page.getByRole('button', { name: 'Dismiss quote tools' }).tap();
   await expect(toolbar).not.toBeVisible();
+  await page.goto('/interaction-sample');
+  const reference = page.locator('[data-footnote-ref]').first();
+  await reference.tap();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await reference.tap();
+  await expect(page.getByRole('dialog')).not.toBeVisible();
   await context.close();
 });
 

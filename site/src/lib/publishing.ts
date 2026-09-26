@@ -10,7 +10,8 @@ export const assetExtensions = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp'
 export function contentFiles(root = CONTENT_DIR): string[] {
   const walk = (directory: string): string[] => fs.readdirSync(directory, { withFileTypes: true })
     .filter((entry) => !entry.name.startsWith('.') && !excluded.has(entry.name))
-    .flatMap((entry) => entry.isDirectory() ? walk(path.join(directory, entry.name)) : [path.join(directory, entry.name)]);
+    // Do not follow symlinks back into an excluded folder or outside the vault.
+    .flatMap((entry) => entry.isDirectory() ? walk(path.join(directory, entry.name)) : entry.isFile() ? [path.join(directory, entry.name)] : []);
   return walk(root).sort();
 }
 
@@ -57,19 +58,27 @@ export function noteSources(root = CONTENT_DIR, { includeDrafts = false } = {}):
 export const noteHref = (slug: string): string => slug === 'index' ? '/about' : `/${slug.split('/').map(encodeURIComponent).join('/')}`;
 
 export function resolveNote(target: string, from: string, notes: NoteSource[]): NoteSource {
-  const wanted = target.replace(/\.md$/i, '').toLowerCase();
-  const relative = path.posix.normalize(path.posix.join(path.posix.dirname(from), target)).replace(/\.md$/i, '').toLowerCase();
-  const direct = notes.filter((note) => note.relative.replace(/\.md$/i, '').toLowerCase() === relative);
-  if (direct.length === 1) return direct[0];
+  const key = (value: string) => value.replace(/\.md$/i, '').normalize('NFC').toLowerCase();
+  const wanted = key(target);
+  const rooted = target.replace(/^\//, '');
+  // An explicit vault path can disambiguate names; a bare name must still fail
+  // when another note shares its title or alias.
+  const candidates = target.startsWith('/') ? [rooted] : [path.posix.join(path.posix.dirname(from), target),
+    ...(target.includes('/') || /\.md$/i.test(target) ? [rooted] : [])];
+  for (const candidate of candidates) {
+    const direct = notes.filter((note) => key(note.relative) === key(path.posix.normalize(candidate)));
+    if (direct.length === 1) return direct[0];
+    if (direct.length > 1) throw new Error(`Ambiguous note link [[${target}]] in ${from}`);
+  }
   const matches = notes.filter((note) => [note.slug, note.title, path.posix.basename(note.relative, '.md'), ...note.aliases]
-    .some((candidate) => candidate.toLowerCase() === wanted));
+    .some((candidate) => key(candidate) === wanted));
   if (matches.length !== 1) throw new Error(`${matches.length ? 'Ambiguous' : 'Missing or unpublished'} note link [[${target}]] in ${from}`);
   return matches[0];
 }
 
 export function resolveAsset(target: string, from: string, root = CONTENT_DIR): string {
   const normalized = target.replace(/^\//, '');
-  const candidates = [path.posix.normalize(path.posix.join(path.posix.dirname(from), normalized)), normalized];
+  const candidates = target.startsWith('/') ? [normalized] : [path.posix.normalize(path.posix.join(path.posix.dirname(from), normalized)), normalized];
   const assets = contentFiles(root).filter((file) => assetExtensions.has(path.extname(file).toLowerCase()));
   const relative = assets.map((file) => path.relative(root, file).split(path.sep).join('/'));
   let match = candidates.find((candidate) => relative.includes(candidate));
