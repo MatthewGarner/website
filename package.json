@@ -17,6 +17,7 @@
     "preview": "npm --prefix site run preview --",
     "check": "npm --prefix site run check",
     "check:hosted": "npm --prefix site run check:hosted --",
-    "test": "npm --prefix site test"
+    "test": "npm --prefix site test",
+    "test:browser": "npm --prefix site run test:browser --"
   }
 }

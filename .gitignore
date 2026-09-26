@@ -14,3 +14,5 @@ quartz/cli/tui/dist/
 .turbo/
 .vercel/
 .env*
+site/test-results/
+site/playwright-report/

@@ -14,7 +14,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "check:hosted": "node --import tsx scripts/check-hosted.ts",
-    "test": "node --import tsx --test tests/*.test.ts"
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.1",
@@ -30,6 +31,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
     "@types/mdast": "4.0.4",
     "@types/node": "24.19.0",
     "tsx": "4.23.15",

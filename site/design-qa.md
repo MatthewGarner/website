@@ -58,3 +58,13 @@ Astro is live at https://www.matthewgarner.me through the Git publishing workflo
 Live browser checks passed for desktop dark appearance, a 390px mobile layout without horizontal overflow, expanding the Drifting preview, opening the note and retaining the chosen appearance. The initial live visit followed the light system appearance. The previous preview browser sign-in limitation no longer applies to the public domain. The unchanged reduced-motion and older-browser branches remain un-emulated.
 
 The migration review found and fixed an RSS identity change and a clean-build dependency accidentally supplied by the old Quartz installation. The live-domain checker now accounts for the existing apex-to-www redirect. Hosting configuration, remaining public-attachment behaviour and rollback are documented in `HOSTING.md`.
+
+## Reading interactions — 26 September 2026
+
+Added native title continuity from selected writing into an article, contextual footnotes, and selected-passage copying with attribution and a text-fragment link. Unsupported features retain ordinary links or manual copying. Tools stays a quiet homepage link.
+
+Release checks passed: 34 files checked without diagnostics, 13 tests, and the production package built. All 22 Chromium/WebKit browser checks passed, covering title transitions and Back, stable previews, keyboard focus/escape, touch dismissal, native no-JavaScript links, system theme changes, blocked storage, reduced motion, missing animation/popover APIs, clipboard denial, and light/dark accessibility scans. Actual clipboard writing/reading was exercised in Chromium; WebKit's successful write was stubbed, with its denial and touch paths exercised. No accessibility-rule violations were reported in the checked states.
+
+The isolated reading sample was visually checked in the in-app browser, including the light desktop and dark phone footnote panels. All three pages of the generated A4 PDF were rendered and inspected: readable code, tables, captions and endnotes, no floating controls or clipping. This closes the earlier reduced-motion, feature-fallback and print-verification gaps. Tests caught and fixed canonical quote URLs, Safari suppressing touch clicks when pointerdown was cancelled, and dark print margins caused by the inline colour scheme. Contrast checks wait for entry animations to finish.
+
+These checks run through `npm run test:browser` and are included in GitHub CI. The sample is built in a temporary copy, outside publishable content. Physical-device and screen-reader usability remain manual checks; this is not a full assistive-technology audit. Changes remain on the local review branch.

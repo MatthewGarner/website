@@ -4,6 +4,8 @@
 
 The site reads the Markdown in `content/` directly. Edit it in Obsidian or any text editor; there is no export step or second copy to maintain.
 
+Readers can open Markdown footnotes beside the sentence and select prose to copy a quotation with a link to that passage. Neither feature needs extra properties. Print output keeps the writing and endnotes and hides the floating controls.
+
 ## Start a new piece
 
 1. Create a note such as `content/Small observations.md`.

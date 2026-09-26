@@ -249,15 +249,23 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   .about { padding-top: 40px; }
 }
 @media print {
-  :root, :root[data-theme='dark'] { --paper: white; --ink: #222; --heading: #222; --muted: #555; --accent: #333; --line: #ccc; --surface: #f5f5f5; --mark: #eee; color-scheme: light; }
+  @page { margin: 18mm 16mm; background: white; }
+  /* Override the inline screen theme too; otherwise Chromium prints dark page margins. */
+  :root, :root[data-theme='dark'] { --paper: white; --ink: #222; --heading: #222; --muted: #555; --accent: #333; --line: #ccc; --surface: #f5f5f5; --mark: #eee; color-scheme: light !important; }
   .site-header, .site-footer, .back-link, .next-essay, .skip-link { display: none; }
   .site-frame, .essay { width: 100%; max-width: none; padding: 0; }
   .essay-heading h1 { font-size: 32pt; }
   .essay-description { font-size: 15pt; }
   .prose { font-size: 12pt; }
+  .prose p { orphans: 3; widows: 3; }
   .prose :is(h2, h3) { break-after: avoid; }
   .prose :is(figure, blockquote, pre) { break-inside: avoid; }
   .prose .astro-code, .prose .astro-code span { color: #222 !important; background-color: #f5f5f5 !important; }
+  .prose pre { white-space: pre-wrap; overflow-wrap: anywhere; overflow: visible; font-size: 10pt; }
+  .prose .table-scroll { overflow: visible; }
+  .prose table { min-width: 0; }
+  .prose img { max-height: 95mm; object-fit: contain; }
+  .prose [data-footnote-backref] { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
