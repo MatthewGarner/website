@@ -1,0 +1,96 @@
+<!-- Set the arrival state before paint. CSS completes the sequence even if a later script fails. -->
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const navigation = performance.getEntriesByType('navigation')[0];
+    const internal = document.referrer && new URL(document.referrer).origin === location.origin;
+    let seen = false;
+    try { seen = sessionStorage.getItem('mg:home-arrival') === 'seen'; } catch {}
+    // A restored page or a deliberate destination should never run an entrance over the reader's place.
+    if (seen || internal || navigation?.type === 'back_forward' || location.hash || motion.matches || document.hidden) return;
+    try { sessionStorage.setItem('mg:home-arrival', 'seen'); } catch {}
+    root.setAttribute('data-home-arrival', '');
+    let timer;
+    function settle() {
+      root.removeAttribute('data-home-arrival');
+      clearTimeout(timer);
+      for (const type of ['pointerdown', 'keydown', 'wheel', 'touchstart']) document.removeEventListener(type, settle, true);
+      removeEventListener('scroll', settle);
+      removeEventListener('resize', settle);
+      removeEventListener('pagehide', settle);
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('home-arrival-settle', settle);
+      motion.removeEventListener('change', settle);
+    }
+    function onVisibility() { if (document.hidden) settle(); }
+    for (const type of ['pointerdown', 'keydown', 'wheel', 'touchstart']) document.addEventListener(type, settle, { capture: true, passive: true });
+    addEventListener('scroll', settle, { passive: true });
+    addEventListener('resize', settle, { passive: true });
+    addEventListener('pagehide', settle);
+    document.addEventListener('visibilitychange', onVisibility);
+    motion.addEventListener('change', settle);
+    document.addEventListener('home-arrival-settle', settle);
+    // Do not replay after a bfcache restore, including browsers without navigation timing.
+    addEventListener('pageshow', (event) => { if (event.persisted) settle(); });
+    document.addEventListener('DOMContentLoaded', () => {
+      if (scrollY > 0) { settle(); return; }
+      timer = setTimeout(settle, 1050);
+    }, { once: true });
+  })();
+</script>
+<style is:global>
+  [data-home-arrival] .headline-line { clip-path: inset(-.08em -.06em -.12em); }
+  [data-home-arrival] .headline-line-ink { animation: arrive-type 580ms cubic-bezier(.22, 1, .36, 1) backwards; }
+  [data-home-arrival] .headline-line:nth-child(2) .headline-line-ink { animation-delay: 85ms; }
+  [data-home-arrival] .headline-line:nth-child(3) .headline-line-ink { animation-delay: 170ms; }
+  [data-home-arrival] .intro-copy > p { animation: arrive-copy 500ms 150ms cubic-bezier(.22, 1, .36, 1) backwards; }
+  [data-home-arrival] .section-heading { position: relative; border-color: transparent; }
+  [data-home-arrival] .section-heading::before, [data-home-arrival] .section-heading::after {
+    content: ''; position: absolute; pointer-events: none; left: 0; right: 0; height: 1px; background: var(--line);
+    transform-origin: left; animation: arrive-rule 480ms 240ms cubic-bezier(.22, 1, .36, 1) backwards;
+  }
+  [data-home-arrival] .section-heading::before { top: -1px; }
+  [data-home-arrival] .section-heading::after { bottom: -1px; animation-delay: 310ms; }
+  [data-home-arrival] .preview-panel { --fan-left: -4deg; --fan-right: 3deg; --fan-shift: 8px; }
+  [data-home-arrival] .preview-panel::before {
+    animation: arrive-paper-back 720ms 150ms cubic-bezier(.22, 1, .36, 1) backwards;
+  }
+  [data-home-arrival] .preview-panel::after {
+    animation: arrive-paper-middle 660ms 210ms cubic-bezier(.22, 1, .36, 1) backwards;
+  }
+  [data-home-arrival] .preview-panel > [data-panel]:not([inert]) > .preview-copy {
+    /* Only the paper and shadow move; links remain under the reader's pointer. */
+    animation: arrive-paper-light 720ms 150ms ease backwards;
+  }
+  @keyframes arrive-type {
+    from { transform: translateY(112%); font-weight: 570; }
+    75% { transform: translateY(-1%); font-weight: 700; }
+    to { transform: none; font-weight: 700; }
+  }
+  @keyframes arrive-copy { from { transform: translateY(20px); } to { transform: none; } }
+  @keyframes arrive-rule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes arrive-paper-back {
+    from { transform: rotate(-.7deg); }
+    35% { transform: translate(calc(-1 * var(--fan-shift)), 3px) rotate(var(--fan-left)); box-shadow: 0 10px 20px rgb(0 0 0 / .10); }
+    to { transform: rotate(-.7deg); box-shadow: none; }
+  }
+  @keyframes arrive-paper-middle {
+    from { transform: rotate(1deg); }
+    35% { transform: translate(var(--fan-shift), -4px) rotate(var(--fan-right)); box-shadow: 0 6px 16px rgb(0 0 0 / .08); }
+    to { transform: rotate(1deg); box-shadow: none; }
+  }
+  @keyframes arrive-paper-light {
+    from, to { box-shadow: 0 5px 15px rgb(0 0 0 / .035); }
+    38% { box-shadow: 0 14px 24px rgb(0 0 0 / .13); }
+  }
+  @media (max-width: 1050px) {
+    [data-home-arrival] .preview-panel { --fan-left: -2deg; --fan-right: 1.7deg; --fan-shift: 4px; }
+  }
+  @media print {
+    [data-home-arrival] .headline-line { clip-path: none; }
+    [data-home-arrival] :is(.headline-line-ink, .intro-copy > p, .preview-copy),
+    [data-home-arrival] .preview-panel::before, [data-home-arrival] .preview-panel::after,
+    [data-home-arrival] .section-heading::before, [data-home-arrival] .section-heading::after { animation: none; }
+  }
+</style>

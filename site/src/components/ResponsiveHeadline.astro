@@ -4,7 +4,7 @@ const lines = ['A few things', 'I’ve been', 'thinking about.'];
 <h1 id="intro-title" class="responsive-headline">
   <span class="sr-only">{lines.join(' ')}</span>
   <span aria-hidden="true" class="headline-visual">
-    {lines.map((line) => <span class="headline-line">{[...line].map((letter) => <span class="headline-letter" data-letter={letter}><span class="headline-ink">{letter}</span></span>)}</span>)}
+    {lines.map((line) => <span class="headline-line"><span class="headline-line-ink">{[...line].map((letter) => <span class="headline-letter" data-letter={letter}><span class="headline-ink">{letter}</span></span>)}</span></span>)}
   </span>
 </h1>
 <script>
@@ -69,6 +69,11 @@ const lines = ['A few things', 'I’ve been', 'thinking about.'];
   headline.addEventListener('pointerenter', measure, { passive: true });
   headline.addEventListener('pointermove', (event) => {
     if (motion.matches || event.pointerType === 'touch' || event.buttons) return;
+    // Stop the entrance before measuring glyph positions for direct manipulation.
+    if (document.documentElement.hasAttribute('data-home-arrival')) {
+      document.dispatchEvent(new Event('home-arrival-settle'));
+      measure();
+    }
     pointer = { x: event.clientX, y: event.clientY };
     wake();
   }, { passive: true });
@@ -95,7 +100,7 @@ const lines = ['A few things', 'I’ve been', 'thinking about.'];
   void document.fonts.ready.then(measure);
 </script>
 <style>
-  .headline-visual, .headline-line { display: block; }
+  .headline-visual, .headline-line, .headline-line-ink { display: block; }
   .headline-line { white-space: nowrap; }
   .headline-letter { display: inline-grid; vertical-align: baseline; }
   /* The resting glyph reserves its width while the visible variable type moves. */

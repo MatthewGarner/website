@@ -17,6 +17,8 @@ test('ordinary article navigation can skip a snapshot without an unhandled rejec
 test('headline responds without moving its letters or surrounding layout, then rests', async ({ page }, testInfo) => {
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);
+  // The entrance deliberately moves the lines; measure the resting layout for pointer interaction.
+  await expect(page.locator('[data-home-arrival]')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: headlineName, exact: true })).toHaveCount(1);
   const geometry = () => page.locator('.headline-letter, .intro-copy, .writing-preview').evaluateAll(elements => elements.map(el => {
     const { x, y, width, height } = el.getBoundingClientRect();
