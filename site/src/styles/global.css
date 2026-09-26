@@ -117,7 +117,8 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .draft-label { margin-left: 12px; color: var(--muted); font: 13px ui-monospace, monospace; }
 .tools-note { margin-top: 36px; padding: 25px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 21px; }
 .tools-note a { color: var(--accent); }
-.site-footer { display: flex; gap: 34px; border-top: 1px solid var(--line); padding: 22px 0 30px; font-size: 23px; }
+.site-footer { border-top: 1px solid var(--line); padding: 22px 0 30px; font-size: 23px; }
+.footer-links { display: flex; gap: 34px; }
 .site-footer a { text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
 .page-heading { padding: 65px 0 55px; max-width: 760px; }
@@ -235,7 +236,8 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   .preview-excerpt { font-size: 21px; margin: 17px 0; }
   .preview-copy .text-link { font-size: 21px; }
   .tools-note { margin-top: 12px; padding: 23px 0; font-size: 19px; }
-  .site-footer { font-size: 17px; gap: 27px; padding-top: 20px; }
+  .site-footer { font-size: 17px; padding-top: 20px; }
+  .footer-links { gap: 27px; }
   .page-heading { padding: 38px 0 36px; }
   .page-heading h1 { font-size: 61px; }
   .page-heading > p:not(.eyebrow) { font-size: 27px; }
