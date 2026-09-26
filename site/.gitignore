@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+.assets/
+.vercel/
+.env*.local
+.vercel
+.env*

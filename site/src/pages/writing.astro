@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { writing, description, noteHref, shortDate, readingMinutes, writingType } from '../lib/content';
+const notes = await writing();
+---
+<BaseLayout title="Writing" description="Occasional essays on technology, work and the things in between.">
+  <header class="page-heading"><h1>Writing</h1><p>Occasional essays on technology, work and the things in between.</p></header>
+  <ul class="archive-list">
+    {notes.map((note) => <li>
+      <div class="archive-meta">{note.data.date && <time class="date" datetime={note.data.date.toISOString()}>{shortDate(note.data.date)}</time>}<span class="writing-type">{writingType(note)}</span><span>{readingMinutes(note)} min read</span></div>
+      <div><h2><a href={noteHref(note.id)}>{note.data.title}</a></h2><p>{description(note)}</p></div>
+    </li>)}
+  </ul>
+</BaseLayout>

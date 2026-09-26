@@ -1,17 +1,16 @@
-# Quartz v5
+# Matthew Garner’s website
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+[Visit the site](https://www.matthewgarner.me) · [Writing in Obsidian](site/AUTHORING.md) · [Hosting and rollback](site/HOSTING.md)
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
+The website uses Astro in `site/` and reads Markdown directly from `content/`. Pushing to `v5` publishes through Vercel; other branches produce protected previews. Builds check the site and its publishing behaviour before deployment.
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+For local development, use Node 24 and run:
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
+```sh
+npm ci --prefix site
+npm --prefix site run dev
+```
 
-## Sponsors
+Run the complete production build with `npm --prefix site run build:release`. See [the site guide](site/README.md) for supported Markdown and design details.
 
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+The former Quartz implementation remains at the repository root for rollback. Its source and original licence are retained; it no longer supplies the production build.

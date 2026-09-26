@@ -1,0 +1,26 @@
+name: Astro publishing
+
+on:
+  pull_request:
+    branches: [v5]
+  push:
+    branches: [v5]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish-check:
+    runs-on: ubuntu-latest
+    env:
+      ASTRO_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci --prefix site
+      - run: npm --prefix site run build:release

@@ -2,6 +2,11 @@
 title: The gardening metaphor
 draft: false
 date: 2025-03-17
+description: On choosing what deserves our attention.
+excerpt: The gardening metaphor for gently pruning one’s tree of knowledge helped me reframe how I read, save and think.
+featured: true
+featureOrder: 1
+type: essay
 aliases:
   - posts/the-gardening-metaphor
 ---
