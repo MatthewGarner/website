@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Preview from '../components/Preview.astro';
+import ResponsiveHeadline from '../components/ResponsiveHeadline.astro';
 import { selectedWriting, shortDate, noteHref, writingType } from '../lib/content';
 const notes = await selectedWriting();
 ---
 <BaseLayout>
   <section class="intro" aria-labelledby="intro-title">
-    <h1 id="intro-title">A few things<br />I’ve been<br />thinking about.</h1>
+    <ResponsiveHeadline />
     <div class="intro-copy">
       <p>I work on products in renewable energy, and write about technology, attention, and life beyond a screen.</p>
       <a href="/about">A little more about me <span aria-hidden="true">→</span></a>
@@ -39,38 +40,5 @@ const notes = await selectedWriting();
   </aside>
 </BaseLayout>
 <script>
-  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-preview]');
-  const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  let previewAnimation: Animation | undefined;
-  function reveal(panel: HTMLElement) {
-    previewAnimation?.cancel();
-    if (reducedMotion.matches || typeof panel.animate !== 'function') return;
-    previewAnimation = panel.animate(
-      [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }],
-      { duration: 240, easing: 'cubic-bezier(.22, 1, .36, 1)' },
-    );
-  }
-  buttons.forEach((button) => button.addEventListener('click', () => {
-    if (button.getAttribute('aria-pressed') === 'true') return;
-    buttons.forEach((item) => {
-      const selected = item === button;
-      item.setAttribute('aria-pressed', String(selected));
-      item.closest('.writing-row')?.classList.toggle('is-selected', selected);
-    });
-    panels.forEach((panel) => {
-      const selected = panel.dataset.panel === button.dataset.preview;
-      panel.inert = !selected;
-      panel.setAttribute('aria-hidden', String(!selected));
-      if (selected) reveal(panel);
-    });
-    document.querySelector('#preview-announcement')!.textContent = button.getAttribute('aria-label')!.replace('Preview ', 'Previewing ');
-  }));
-  document.querySelectorAll<HTMLDetailsElement>('.mobile-preview').forEach((details) => {
-    details.addEventListener('toggle', () => {
-      if (details.open) reveal(details.querySelector<HTMLElement>('.preview-copy')!);
-    });
-  });
-  reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) previewAnimation?.cancel(); });
-  document.querySelector('.writing-preview')?.setAttribute('data-preview-ready', '');
+  import '../scripts/previews';
 </script>

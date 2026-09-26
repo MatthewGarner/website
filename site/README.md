@@ -89,7 +89,8 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 | --- | --- |
 | Article text, titles, dates and homepage selections | Markdown in `content/`; see [the authoring guide](AUTHORING.md). |
 | About heading, biography and portrait reference | `content/index.md` |
-| Homepage headline, introduction and Tools link | [src/pages/index.astro](src/pages/index.astro) |
+| Homepage introduction and Tools link | [src/pages/index.astro](src/pages/index.astro) |
+| Homepage headline and its pointer/touch response | [src/components/ResponsiveHeadline.astro](src/components/ResponsiveHeadline.astro) |
 | Site name, navigation, footer links, default description and theme toggle | [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) |
 | Colours, spacing, typography, mobile layouts and transitions | [src/styles/global.css](src/styles/global.css) |
 | Article layout, reading time and “Keep reading” | [src/pages/[...slug].astro](src/pages/%5B...slug%5D.astro) |
@@ -101,6 +102,8 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 The colour variables at the top of `global.css` define light mode; `:root[data-theme='dark']` defines dark mode. Fonts are imported in `BaseLayout.astro` and selected through `--display` and `--serif` in the stylesheet. Both fonts are served locally.
 
 Appearance follows the reader’s system until they toggle it, then remembers their choice. After a visual change, check both themes, a narrow screen, keyboard focus and the article preview interaction. Keep the reduced-motion behaviour when editing transitions.
+
+The headline responds to the pointer and ripples on a touch tap, then rests. Paper previews lift into place and expand into an article alongside its title. Clicking Appearance reveals the new theme from the icon; automatic system changes use a quiet crossfade. Reduced motion keeps everything still. These effects add no authoring requirements or animation dependencies.
 
 ### Reading interactions and browser checks
 
@@ -115,7 +118,7 @@ npm run test:browser
 
 The suite builds an isolated copy with the reading sample, never adding fixtures to `content/`. It checks keyboard and touch controls, reduced motion, missing features, blocked storage and clipboard access, light/dark contrast, and print output in Chromium and WebKit. GitHub runs it automatically. Print screenshots and the Chromium PDF are written under `site/test-results/`; failed runs retain traces. Physical devices and screen-reader use still benefit from occasional manual checks.
 
-Interaction code lives in `src/components/ReadingTransition.astro`, `Footnotes.astro` and `QuotePassage.astro`; print rules live in `src/styles/global.css`.
+Interaction code lives in `src/components/ResponsiveHeadline.astro`, `ReadingTransition.astro`, `Footnotes.astro` and `QuotePassage.astro`, plus `src/scripts/previews.ts` and `appearance.ts`. Print and shared motion rules live in `src/styles/global.css`.
 
 Do not hand-edit `site/dist/`, `site/.assets/`, `site/.astro/` or `.vercel/output/`; builds regenerate them. Publishing rules live in `src/lib/publishing.ts`, Markdown handling in `src/lib/obsidian.ts` and `src/lib/markdown.ts`, and rendering configuration in `astro.config.ts`.
 

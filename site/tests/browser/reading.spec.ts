@@ -19,6 +19,7 @@ test('preview holds its place and the title travels into the article, then clean
     addEventListener('pagereveal', (event: any) => {
       event.viewTransition?.ready.then(() => {
         document.documentElement.dataset.capturedTitle = document.querySelector<HTMLElement>('h1[data-reading-title]')?.style.viewTransitionName ?? '';
+        document.documentElement.dataset.capturedSheet = document.querySelector<HTMLElement>('.essay')?.style.viewTransitionName ?? '';
       }, () => {});
     });
   });
@@ -32,11 +33,16 @@ test('preview holds its place and the title travels into the article, then clean
   await page.getByRole('link', { name: 'Read the note', exact: true }).click();
   await expect(page).toHaveURL(/\/drifting$/);
   const supportsTransition = await page.evaluate(() => 'onpagereveal' in window && 'navigation' in window);
-  if (supportsTransition) await expect(page.locator('html')).toHaveAttribute('data-captured-title', 'reading-title');
+  if (supportsTransition) {
+    await expect(page.locator('html')).toHaveAttribute('data-captured-title', 'reading-title');
+    await expect(page.locator('html')).toHaveAttribute('data-captured-sheet', 'reading-sheet');
+  }
   await expect(page.locator('h1')).toHaveCSS('view-transition-name', 'none');
+  await expect(page.locator('.essay')).toHaveCSS('view-transition-name', 'none');
   await page.goBack();
   await expect(page.getByRole('heading', { name: 'Selected writing' })).toBeVisible();
   await expect(page.locator('[data-reading-transition]')).toHaveCount(0);
+  await expect(page.locator('[style*="view-transition-name"]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

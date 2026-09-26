@@ -25,10 +25,15 @@
       const candidates = [...document.querySelectorAll('[data-reading-title]')].filter((title) => title.dataset.readingTitle === path && visible(title));
       const title = outgoing && candidates.includes(clickedTitle) ? clickedTitle : candidates[0];
       if (!title) { transition.skipTransition(); return; }
+      const sheet = location.pathname === '/'
+        ? title.closest('.preview-copy') || [...document.querySelectorAll('.preview-copy')].find((panel) => panel.querySelector('[data-reading-title]')?.dataset.readingTitle === path && visible(panel))
+        : document.querySelector('.essay');
       title.style.viewTransitionName = 'reading-title';
+      if (sheet) sheet.style.viewTransitionName = 'reading-sheet';
       document.documentElement.dataset.readingTransition = '';
       const cleanup = () => {
         title.style.removeProperty('view-transition-name');
+        sheet?.style.removeProperty('view-transition-name');
         delete document.documentElement.dataset.readingTransition;
         clickedTitle = undefined;
       };
@@ -48,9 +53,30 @@
 <style is:global>
   @view-transition { navigation: auto; }
   :root[data-reading-transition]::view-transition-group(reading-title) {
-    animation-duration: 360ms;
+    z-index: 2;
+    animation-duration: 520ms;
     animation-timing-function: cubic-bezier(.22, 1, .36, 1);
   }
+  :root[data-reading-transition]::view-transition-group(reading-sheet) {
+    z-index: 1;
+    overflow: clip;
+    animation-duration: 520ms;
+    animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+  }
+  /* Fit both title snapshots to the same box while the font size changes. */
+  :root[data-reading-transition]::view-transition-old(reading-title),
+  :root[data-reading-transition]::view-transition-new(reading-title) { height: 100%; }
+  :root[data-reading-transition]::view-transition-old(reading-sheet),
+  :root[data-reading-transition]::view-transition-new(reading-sheet) {
+    height: 100%;
+    object-fit: none;
+    object-position: top left;
+    mix-blend-mode: normal;
+  }
+  :root[data-reading-transition]::view-transition-old(reading-sheet) { animation: sheet-out 180ms ease both; }
+  :root[data-reading-transition]::view-transition-new(reading-sheet) { animation: sheet-in 520ms ease both; }
+  @keyframes sheet-out { to { opacity: 0; } }
+  @keyframes sheet-in { 0%, 20% { opacity: 0; } 85%, 100% { opacity: 1; } }
   :root[data-reading-transition]::view-transition-old(root),
   :root[data-reading-transition]::view-transition-new(root) { animation-duration: 180ms; }
   @media (prefers-reduced-motion: reduce) {

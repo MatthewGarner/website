@@ -68,3 +68,11 @@ Release checks passed: 34 files checked without diagnostics, 13 tests, and the p
 The isolated reading sample was visually checked in the in-app browser, including the light desktop and dark phone footnote panels. All three pages of the generated A4 PDF were rendered and inspected: readable code, tables, captions and endnotes, no floating controls or clipping. This closes the earlier reduced-motion, feature-fallback and print-verification gaps. Tests caught and fixed canonical quote URLs, Safari suppressing touch clicks when pointerdown was cancelled, and dark print margins caused by the inline colour scheme. Contrast checks wait for entry animations to finish.
 
 These checks run through `npm run test:browser` and are included in GitHub CI. The sample is built in a temporary copy, outside publishable content. Physical-device and screen-reader usability remain manual checks; this is not a full assistive-technology audit. Changes remain on the local review branch.
+
+## Editorial motion — 26 September 2026
+
+Added a variable-weight headline response with fixed glyph widths, a touch ripple, paper-stack preview changes, sheet-to-article continuity and a circular theme reveal from the appearance icon. Effects settle when idle; touch gestures retain native scrolling. System theme changes still crossfade. Reduced-motion changes cancel active effects, and unavailable snapshot animation falls back to a working theme switch.
+
+Release build passed with 38 files checked without diagnostics and all 13 publishing tests. All 34 Chromium/WebKit browser checks passed, including pointer/touch response, stable layout at 320/390/768/1200px, rapid selection, snapshot cleanup, live reduced-motion changes, rejected snapshot animation, and existing reading/accessibility/print checks. Visual inspection caught overlapping title snapshots: fitting the article title to its text and matching snapshot heights corrected this. The 10 affected navigation, layout, touch and accessibility checks passed again after that refinement.
+
+Inspected the actual theme reveal and paper opening in the in-app browser, plus desktop light/dark and the 390px dark phone layout. No browser errors. Physical-phone gestures and VoiceOver remain manual checks. This pass is prepared on `codex/editorial-motion` for review.

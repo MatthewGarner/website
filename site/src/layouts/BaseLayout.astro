@@ -62,61 +62,7 @@ const current = Astro.url.pathname;
       </footer>
     </div>
     <script>
-      const preferenceKey = 'mg:appearance';
-      const systemTheme = matchMedia('(prefers-color-scheme: dark)');
-      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-      const appearance = document.querySelector<HTMLButtonElement>('.appearance')!;
-      const root = document.documentElement;
-      type Theme = 'light' | 'dark';
-      const savedTheme = (value: string | null): Theme | null => value === 'light' || value === 'dark' ? value : null;
-      let preference: Theme | null = null;
-      try { preference = savedTheme(localStorage.getItem(preferenceKey)); } catch {}
-      const currentTheme = (): Theme => preference ?? (systemTheme.matches ? 'dark' : 'light');
-      let transition: ViewTransition | undefined;
-      let revision = 0;
-      let fadeTimer: ReturnType<typeof setTimeout>;
-
-      function applyTheme(animate = false) {
-        const theme = currentTheme();
-        const change = ++revision;
-        transition?.skipTransition();
-        const update = () => {
-          // A fast second tap must win even if the previous snapshot is pending.
-          if (change !== revision) return;
-          root.dataset.theme = theme;
-          root.style.colorScheme = theme;
-          const action = `Switch to ${theme === 'light' ? 'dark' : 'light'} mode`;
-          appearance.setAttribute('aria-label', `Appearance: ${action.toLowerCase()}`);
-          appearance.title = action;
-        };
-        if (!animate || reducedMotion.matches || root.dataset.theme === theme) {
-          update();
-        } else if (typeof document.startViewTransition === 'function') {
-          const next = document.startViewTransition(update);
-          transition = next;
-          // Skipping a transition rejects ready, but still applies its update.
-          void next.ready.catch(() => {});
-          void next.finished.then(() => { if (transition === next) transition = undefined; });
-        } else {
-          root.classList.add('theme-fade');
-          clearTimeout(fadeTimer);
-          update();
-          fadeTimer = setTimeout(() => root.classList.remove('theme-fade'), 400);
-        }
-      }
-      appearance.addEventListener('click', () => {
-        preference = currentTheme() === 'light' ? 'dark' : 'light';
-        try { localStorage.setItem(preferenceKey, preference); } catch {}
-        applyTheme(true);
-      });
-      systemTheme.addEventListener('change', () => { if (preference === null) applyTheme(true); });
-      window.addEventListener('storage', (event) => {
-        if (event.key === preferenceKey || event.key === null) {
-          preference = savedTheme(event.newValue);
-          applyTheme(true);
-        }
-      });
-      applyTheme();
+      import '../scripts/appearance';
     </script>
   </body>
 </html>
