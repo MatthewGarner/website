@@ -3,6 +3,17 @@ import { test, expect, type Page } from '@playwright/test';
 const headlineName = 'A few things I’ve been thinking about.';
 const inkWeights = (page: Page) => page.locator('.headline-ink').evaluateAll(letters => letters.map(letter => Number(getComputedStyle(letter).fontWeight)));
 
+test('ordinary article navigation can skip a snapshot without an unhandled rejection', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/drifting');
+  await page.getByRole('navigation', { name: 'More writing' }).getByRole('link').click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText("I'll stay home thanks");
+  await page.getByRole('link', { name: 'Matthew Garner', exact: true }).click();
+  await expect(page.getByRole('heading', { name: headlineName, exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test('headline responds without moving its letters or surrounding layout, then rests', async ({ page }, testInfo) => {
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);

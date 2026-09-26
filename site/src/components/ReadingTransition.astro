@@ -17,6 +17,8 @@
     });
     function prepare(transition, from, to, outgoing) {
       if (!transition) return;
+      // Ordinary navigation may intentionally skip a snapshot; ready then rejects.
+      void transition.ready.catch(() => {});
       if (motion.matches || !from || !to || (from.pathname !== '/' && to.pathname !== '/')) {
         transition.skipTransition();
         return;
