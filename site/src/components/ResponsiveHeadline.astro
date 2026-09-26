@@ -1,0 +1,104 @@
+---
+const lines = ['A few things', 'I’ve been', 'thinking about.'];
+---
+<h1 id="intro-title" class="responsive-headline">
+  <span class="sr-only">{lines.join(' ')}</span>
+  <span aria-hidden="true" class="headline-visual">
+    {lines.map((line) => <span class="headline-line">{[...line].map((letter) => <span class="headline-letter" data-letter={letter}><span class="headline-ink">{letter}</span></span>)}</span>)}
+  </span>
+</h1>
+<script>
+  const headline = document.querySelector<HTMLElement>('.responsive-headline')!;
+  const letters = [...headline.querySelectorAll<HTMLElement>('.headline-ink')];
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let centres: { x: number; y: number }[] = [];
+  let strengths = letters.map(() => 0);
+  let pointer: { x: number; y: number } | undefined;
+  let touch: { x: number; y: number; id: number } | undefined;
+  let ripple: { x: number; y: number; start: number } | undefined;
+  let frame = 0;
+  let previous = 0;
+  let radius = 140;
+
+  function measure() {
+    radius = parseFloat(getComputedStyle(headline).fontSize) * 1.65;
+    centres = letters.map((letter) => {
+      const rect = letter.parentElement!.getBoundingClientRect();
+      return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+    });
+  }
+  function reset() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    previous = 0;
+    pointer = ripple = touch = undefined;
+    strengths = letters.map(() => 0);
+    letters.forEach((letter) => { letter.style.removeProperty('font-weight'); letter.style.removeProperty('transform'); });
+  }
+  function tick(now: number) {
+    const smoothing = 1 - Math.exp(-Math.min(now - (previous || now - 16), 48) / 55);
+    previous = now;
+    if (ripple && now - ripple.start > 850) ripple = undefined;
+    let unsettled = false;
+    letters.forEach((letter, index) => {
+      const centre = centres[index];
+      let target = 0;
+      if (pointer) target = Math.max(0, 1 - Math.hypot(centre.x - pointer.x, centre.y - pointer.y) / radius) ** 2;
+      if (ripple) {
+        const elapsed = (now - ripple.start) / 850;
+        const distance = Math.hypot(centre.x - ripple.x, centre.y - ripple.y);
+        target = Math.max(target, Math.max(0, 1 - Math.abs(distance - elapsed * radius * 4) / (radius * .6)) * (1 - elapsed));
+      }
+      const strength = strengths[index] + (target - strengths[index]) * smoothing;
+      strengths[index] = strength < .002 && target === 0 ? 0 : strength;
+      unsettled ||= Math.abs(target - strengths[index]) > .002;
+      if (strengths[index] === 0) {
+        letter.style.removeProperty('font-weight');
+        letter.style.removeProperty('transform');
+      } else {
+        letter.style.fontWeight = String(700 - strengths[index] * 330);
+        letter.style.transform = `translateY(${-strengths[index] * 2}px)`;
+      }
+    });
+    frame = unsettled || ripple ? requestAnimationFrame(tick) : 0;
+    if (!frame) previous = 0;
+  }
+  function wake() {
+    if (!frame && !motion.matches) frame = requestAnimationFrame(tick);
+  }
+  headline.addEventListener('pointerenter', measure, { passive: true });
+  headline.addEventListener('pointermove', (event) => {
+    if (motion.matches || event.pointerType === 'touch' || event.buttons) return;
+    pointer = { x: event.clientX, y: event.clientY };
+    wake();
+  }, { passive: true });
+  headline.addEventListener('pointerleave', () => { pointer = undefined; wake(); }, { passive: true });
+  headline.addEventListener('pointerdown', (event) => {
+    if (motion.matches || event.pointerType === 'mouse' || !event.isPrimary) return;
+    touch = { x: event.clientX, y: event.clientY, id: event.pointerId };
+  }, { passive: true });
+  headline.addEventListener('pointerup', (event) => {
+    // Only a tap ripples. Never cancel pointer events or turn a scroll into an effect.
+    if (touch?.id === event.pointerId && Math.hypot(event.clientX - touch.x, event.clientY - touch.y) < 12) {
+      measure();
+      ripple = { x: event.clientX, y: event.clientY, start: performance.now() };
+      wake();
+    }
+    touch = undefined;
+  }, { passive: true });
+  headline.addEventListener('pointercancel', () => { touch = undefined; }, { passive: true });
+  addEventListener('resize', () => { reset(); measure(); }, { passive: true });
+  addEventListener('scroll', reset, { passive: true });
+  addEventListener('pagehide', reset);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) reset(); });
+  motion.addEventListener('change', reset);
+  void document.fonts.ready.then(measure);
+</script>
+<style>
+  .headline-visual, .headline-line { display: block; }
+  .headline-line { white-space: nowrap; }
+  .headline-letter { display: inline-grid; vertical-align: baseline; }
+  /* The resting glyph reserves its width while the visible variable type moves. */
+  .headline-letter::before { content: attr(data-letter); grid-area: 1 / 1; visibility: hidden; font-weight: 700; white-space: pre; }
+  .headline-ink { grid-area: 1 / 1; white-space: pre; }
+</style>
