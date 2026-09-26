@@ -21,9 +21,15 @@
       removeEventListener('pagehide', settle);
       document.removeEventListener('visibilitychange', onVisibility);
       document.removeEventListener('home-arrival-settle', settle);
+      document.removeEventListener('animationend', onAnimationEnd);
       motion.removeEventListener('change', settle);
     }
     function onVisibility() { if (document.hidden) settle(); }
+    function onAnimationEnd(event) {
+      if (!event.animationName.startsWith('arrive-')) return;
+      const animations = document.getAnimations?.();
+      if (animations && !animations.some(animation => animation.animationName?.startsWith('arrive-') && animation.playState !== 'finished')) settle();
+    }
     for (const type of ['pointerdown', 'keydown', 'wheel', 'touchstart']) document.addEventListener(type, settle, { capture: true, passive: true });
     addEventListener('scroll', settle, { passive: true });
     addEventListener('resize', settle, { passive: true });
@@ -31,11 +37,14 @@
     document.addEventListener('visibilitychange', onVisibility);
     motion.addEventListener('change', settle);
     document.addEventListener('home-arrival-settle', settle);
+    document.addEventListener('animationend', onAnimationEnd);
     // Do not replay after a bfcache restore, including browsers without navigation timing.
     addEventListener('pageshow', (event) => { if (event.persisted) settle(); });
     document.addEventListener('DOMContentLoaded', () => {
       if (scrollY > 0) { settle(); return; }
-      timer = setTimeout(settle, 1050);
+      // A cold WebKit compositor can start later than DOMContentLoaded. Let the actual
+      // CSS timelines finish; this timer only cleans up if animation events are unavailable.
+      timer = setTimeout(settle, 5000);
     }, { once: true });
   })();
 </script>

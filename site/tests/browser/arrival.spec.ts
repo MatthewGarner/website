@@ -42,6 +42,23 @@ test('returning and reloading preserve the page without replaying the entrance',
   expect(await page.evaluate(() => (window as any).arrivalAnimations)).toEqual([]);
 });
 
+test('a slower rendering timeline finishes before the entrance state is cleared', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-home-arrival]')).toHaveCount(1);
+  await page.evaluate(() => {
+    const animations = document.getAnimations().filter(animation => (animation as CSSAnimation).animationName?.startsWith('arrive-'));
+    for (const animation of animations) animation.playbackRate = .35;
+    // Removing the CSS selector resets retained animation objects to idle; record completion first.
+    (window as any).arrivalFinished = false;
+    void Promise.all(animations.map(animation => animation.finished)).then(() => { (window as any).arrivalFinished = true; }, () => {});
+  });
+  // A cold compositor can lag wall-clock time; cleanup must follow animation completion.
+  await page.waitForTimeout(1100);
+  await expect(page.locator('[data-home-arrival]')).toHaveCount(1);
+  await expect(page.locator('[data-home-arrival]')).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).arrivalFinished)).toBe(true);
+});
+
 test('an early preview choice finishes the entrance and remains actionable', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
