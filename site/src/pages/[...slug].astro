@@ -5,6 +5,7 @@ import { readableNotes, isLocalDraft, writing, description, noteHref, longDate, 
 import arrowLeft from '@phosphor-icons/core/assets/regular/arrow-left.svg?raw';
 import Footnotes from '../components/Footnotes.astro';
 import QuotePassage from '../components/QuotePassage.astro';
+import ReadingDetails from '../components/ReadingDetails.astro';
 export async function getStaticPaths() {
   return (await readableNotes()).map((note) => ({ params: { slug: note.id }, props: { note } }));
 }
@@ -25,6 +26,8 @@ const next = others[(current + 1) % others.length];
     <div class="prose"><Content /></div>
     <Footnotes />
     <QuotePassage title={note.data.title} path={noteHref(note.id)} localDraft={isLocalDraft(note)} />
-    {next && next.id !== note.id && <nav class="next-essay" aria-label="More writing"><span class="eyebrow">Keep reading</span><a href={noteHref(next.id)}>{next.data.title}</a></nav>}
+    <ReadingDetails>
+      {next && next.id !== note.id && <nav class="next-essay" aria-label="More writing"><span class="eyebrow">Keep reading</span><a href={noteHref(next.id)}>{next.data.title}</a></nav>}
+    </ReadingDetails>
   </article>
 </BaseLayout>
