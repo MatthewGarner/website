@@ -106,7 +106,7 @@ The colour variables at the top of `global.css` define light mode; `:root[data-t
 
 Appearance follows the reader’s system until they toggle it, then remembers their choice. After a visual change, check both themes, a narrow screen, keyboard focus and the article preview interaction. Keep the reduced-motion behaviour when editing transitions.
 
-On a fresh homepage visit, the headline arrives line by line, the introduction follows, the section rules draw and the paper stack briefly fans apart. The sequence finishes within a second and runs once per tab session; returning through site navigation, Back or a section link keeps the page still. Clicking, typing or scrolling settles it immediately. To see it again, open the homepage directly in a new tab.
+On a fresh homepage visit, the headline arrives line by line, the introduction follows, the section rules draw and the desktop paper stack briefly fans apart. The sequence finishes within a second. A background tab waits until it is first shown, and phone viewport changes do not cancel it. Refreshing at the top replays the entrance; returning through site navigation, Back, a section link or a refresh partway down keeps the page still. Clicking, typing or scrolling settles it immediately.
 
 The headline responds to the pointer and ripples on a touch tap, then rests. Paper previews lift into place and expand into an article alongside its title. Clicking Appearance reveals the new theme from the icon; automatic system changes use a quiet crossfade. Reduced motion keeps everything still. These effects add no authoring requirements or animation dependencies.
 
