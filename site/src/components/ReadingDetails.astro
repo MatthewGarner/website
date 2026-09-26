@@ -1,0 +1,116 @@
+<div class="reading-marker" aria-hidden="true" hidden>
+  <span class="reading-marker-track"><span class="reading-marker-thumb"></span></span>
+</div>
+<footer class="article-ending">
+  <div class="article-end-mark" aria-hidden="true">
+    <svg viewBox="0 0 48 24" width="48" height="24" focusable="false">
+      <path d="M3 12H17L23 6L29 12L23 18L17 12H45" pathLength="1" />
+    </svg>
+  </div>
+  <slot />
+</footer>
+<script>
+  const prose = document.querySelector<HTMLElement>('.essay > .prose')!;
+  const essay = prose.closest<HTMLElement>('.essay')!;
+  const marker = document.querySelector<HTMLElement>('.reading-marker')!;
+  const ending = document.querySelector<HTMLElement>('.article-ending')!;
+  const endMark = ending.querySelector<HTMLElement>('.article-end-mark')!;
+  const stroke = endMark.querySelector('path')!;
+  const next = ending.querySelector<HTMLElement>('.next-essay');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const print = matchMedia('print');
+  const animations = new Set<Animation>();
+  let frame = 0;
+  let top = 0;
+  let bottom = 0;
+  let viewport = innerHeight;
+  let longEnough = false;
+  let played = false;
+
+  function settle() {
+    animations.forEach(animation => animation.cancel());
+    animations.clear();
+  }
+  function update() {
+    frame = 0;
+    marker.hidden = !longEnough || motion.matches || print.matches;
+    if (marker.hidden) return;
+    // Measure the prose, not the page: opening the footer must never change reading progress.
+    const start = top - viewport * .25;
+    const end = bottom - viewport * .75;
+    const progress = Math.min(1, Math.max(0, (scrollY - start) / (end - start)));
+    marker.style.setProperty('--reading-progress', String(progress));
+    marker.toggleAttribute('data-active', scrollY + viewport * .5 >= top && scrollY + viewport * .2 < bottom);
+  }
+  function schedule() {
+    if (!frame) frame = requestAnimationFrame(update);
+  }
+  function measure() {
+    const bounds = prose.getBoundingClientRect();
+    viewport = innerHeight;
+    top = bounds.top + scrollY;
+    bottom = bounds.bottom + scrollY;
+    longEnough = bounds.height > viewport * 1.5;
+    marker.style.setProperty('--reading-left', `${Math.max(16, bounds.left - 44)}px`);
+    schedule();
+  }
+  function animate(element: Element, frames: Keyframe[], options: KeyframeAnimationOptions) {
+    if (typeof element.animate !== 'function') return;
+    const animation = element.animate(frames, options);
+    animations.add(animation);
+    void animation.finished.then(() => animations.delete(animation), () => {});
+  }
+  function finish() {
+    if (played) return;
+    played = true;
+    if (motion.matches || print.matches) return;
+    animate(stroke, [{ strokeDasharray: '1', strokeDashoffset: '1' }, { strokeDasharray: '1', strokeDashoffset: '0' }], {
+      duration: 560, easing: 'cubic-bezier(.22, 1, .36, 1)',
+    });
+    // Keep the recommendation fully legible and clickable, even during its entrance.
+    if (next) animate(next, [{ transform: 'translateY(7px)' }, { transform: 'none' }], {
+      duration: 440, delay: 120, fill: 'backwards', easing: 'cubic-bezier(.22, 1, .36, 1)',
+    });
+  }
+
+  if (typeof IntersectionObserver === 'function') {
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) { finish(); observer.disconnect(); }
+    }, { rootMargin: '0px 0px -12% 0px', threshold: .1 });
+    observer.observe(endMark);
+  }
+  if (typeof ResizeObserver === 'function') {
+    const observer = new ResizeObserver(measure);
+    observer.observe(prose);
+    observer.observe(essay);
+  }
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', measure, { passive: true });
+  addEventListener('pageshow', measure);
+  prose.addEventListener('load', measure, true);
+  void document.fonts.ready.then(measure);
+  for (const preference of [motion, print]) preference.addEventListener('change', () => {
+    if (motion.matches || print.matches) settle();
+    measure();
+  });
+  addEventListener('pagehide', () => { cancelAnimationFrame(frame); frame = 0; settle(); });
+  measure();
+</script>
+<style>
+  .reading-marker { --reading-length: clamp(100px, 20vh, 180px); position: fixed; z-index: 5; top: 50%; left: var(--reading-left, 16px); width: 7px; height: var(--reading-length); transform: translateY(-50%); pointer-events: none; opacity: 0; transition: opacity 160ms ease; }
+  .reading-marker[data-active] { opacity: 1; }
+  .reading-marker-track { display: block; position: relative; height: 100%; width: 1px; margin-inline: auto; background: var(--line); }
+  .reading-marker-thumb { display: block; position: absolute; top: 0; left: -2px; width: 5px; height: 22px; border-radius: 1px; background: var(--accent); transform: translateY(calc(var(--reading-progress, 0) * (var(--reading-length) - 22px))); }
+  .article-ending { margin-top: 36px; }
+  .article-end-mark { height: 24px; color: var(--accent); }
+  .article-end-mark svg { display: block; overflow: visible; }
+  .article-end-mark path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  @media (max-width: 1050px) {
+    .reading-marker { top: 0; left: 0; right: 0; width: auto; height: 2px; transform: none; }
+    .reading-marker-track { width: 100%; background: var(--line); }
+    .reading-marker-thumb { left: 0; width: 100%; height: 2px; border-radius: 0; transform: scaleX(var(--reading-progress, 0)); transform-origin: left; }
+  }
+  @media (prefers-reduced-motion: reduce) { .reading-marker { display: none !important; } }
+  @media (forced-colors: active) { .reading-marker-track { background: CanvasText; } .reading-marker-thumb { background: Highlight; } }
+  @media print { .reading-marker, .article-ending { display: none !important; } }
+</style>
