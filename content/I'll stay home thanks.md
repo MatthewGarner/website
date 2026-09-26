@@ -2,6 +2,8 @@
 draft: false
 date: 2024-10-21
 title: I'll stay home thanks
+description: Finding new things to appreciate a little closer to home.
+type: essay
 aliases:
   - posts/ill-stay-home-thanks
 ---

@@ -4,6 +4,8 @@ tags:
 title: 97.3% of {people like you} do this
 date: 2025-07-13
 draft: false
+description: On writing for people in a feed built for attention.
+type: essay
 aliases:
   - posts/pet-peeves-1
 ---

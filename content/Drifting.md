@@ -2,6 +2,10 @@
 title: Drifting
 date: 2025-03-15
 draft: false
+description: A little more intention.
+featured: true
+featureOrder: 3
+type: note
 aliases:
   - posts/drifting
 ---

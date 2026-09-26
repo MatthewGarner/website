@@ -1,0 +1,26 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { publishedNotes, writing, description, noteHref, longDate, readingMinutes, writingType } from '../lib/content';
+import arrowLeft from '@phosphor-icons/core/assets/regular/arrow-left.svg?raw';
+export async function getStaticPaths() {
+  return (await publishedNotes()).map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+const { note } = Astro.props;
+const { Content } = await render(note);
+const others = await writing();
+const current = others.findIndex((entry) => entry.id === note.id);
+const next = others[(current + 1) % others.length];
+---
+<BaseLayout title={note.data.title} description={description(note)} article>
+  <article class:list={['essay', { 'essay-note': writingType(note) === 'note' }]}>
+    <a class="back-link" href="/writing"><span class="icon" aria-hidden="true" set:html={arrowLeft} />All writing</a>
+    <header class="essay-heading">
+      <h1>{note.data.title}</h1>
+      {note.data.description && <p class="essay-description">{description(note)}</p>}
+      <p class="essay-meta"><span class="writing-type">{writingType(note)}</span>{note.data.date && <time datetime={note.data.date.toISOString()}>{longDate(note.data.date)}</time>}<span>{readingMinutes(note)} min read</span></p>
+    </header>
+    <div class="prose"><Content /></div>
+    {next && next.id !== note.id && <nav class="next-essay" aria-label="More writing"><span class="eyebrow">Keep reading</span><a href={noteHref(next.id)}>{next.data.title}</a></nav>}
+  </article>
+</BaseLayout>

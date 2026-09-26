@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Preview from '../components/Preview.astro';
+import { selectedWriting, shortDate, noteHref } from '../lib/content';
+const notes = await selectedWriting();
+---
+<BaseLayout>
+  <section class="intro" aria-labelledby="intro-title">
+    <h1 id="intro-title">A few things<br />I’ve been<br />thinking about.</h1>
+    <p>I work on products in renewable energy, make small tools, and write occasionally.</p>
+  </section>
+  <section class="writing-preview" aria-labelledby="writing-title">
+    <div class="selected-writing">
+      <div class="section-heading"><h2 id="writing-title">Writing</h2><a class="all-writing" href="/writing">All writing</a></div>
+      <ul class="writing-list">
+        {notes.map((note, index) => <li class:list={['writing-row', { 'is-selected': index === 0 }]} data-note={note.id}>
+          <div class="row-heading">
+            <a class="article-title" href={noteHref(note.id)}>{note.data.title}</a>
+            <button class="preview-button" type="button" aria-label={`Preview ${note.data.title}`} aria-pressed={index === 0 ? 'true' : 'false'} aria-controls={`preview-${note.id}`} data-preview={note.id}>Preview</button>
+          </div>
+          <time class="date" datetime={note.data.date?.toISOString()}>{shortDate(note.data.date)}</time>
+          <details class="mobile-preview">
+            <summary>Preview<span class="sr-only"> {note.data.title}</span></summary>
+            <Preview note={note} />
+          </details>
+        </li>)}
+      </ul>
+    </div>
+    <aside class="preview-panel" aria-label="Selected writing preview">
+      {notes.map((note, index) => <div id={`preview-${note.id}`} data-panel={note.id} hidden={index !== 0}><Preview note={note} /></div>)}
+      <span class="sr-only" aria-live="polite" id="preview-announcement"></span>
+    </aside>
+  </section>
+  <section class="projects" id="projects" aria-labelledby="projects-title">
+    <div><h2 id="projects-title">Also making: <a href="https://tools.matthewgarner.me">Tools</a></h2><p>Small tools for thinking clearly.</p></div>
+    <a class="text-link" href="https://tools.matthewgarner.me">Explore tools</a>
+  </section>
+</BaseLayout>
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-preview]');
+  const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
+  buttons.forEach((button) => button.addEventListener('click', () => {
+    buttons.forEach((item) => {
+      const selected = item === button;
+      item.setAttribute('aria-pressed', String(selected));
+      item.closest('.writing-row')?.classList.toggle('is-selected', selected);
+    });
+    panels.forEach((panel) => { panel.hidden = panel.dataset.panel !== button.dataset.preview; });
+    document.querySelector('#preview-announcement')!.textContent = button.getAttribute('aria-label')!.replace('Preview ', 'Previewing ');
+  }));
+</script>

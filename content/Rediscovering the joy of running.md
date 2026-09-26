@@ -2,6 +2,10 @@
 draft: false
 date: 2025-04-06
 title: Rediscovering the joy of running
+description: Making room for the enjoyable part.
+featured: true
+featureOrder: 2
+type: essay
 aliases:
   - posts/rediscovering-the-joy-of-running
 ---
