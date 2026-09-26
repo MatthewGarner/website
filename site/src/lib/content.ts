@@ -3,7 +3,10 @@ import { isPublished, plainText, noteHref } from './publishing';
 import { newestFirst, selectFeatured } from './editorial';
 
 export type Note = CollectionEntry<'notes'>;
+export const isLocalDraft = (note: Note) => import.meta.env.DEV && note.data.localDraft;
 export const publishedNotes = () => getCollection('notes', (note) => note.id !== 'index' && isPublished(note.data));
+export const localDrafts = async () => (await getCollection('notes', (note) => note.id !== 'index' && isLocalDraft(note))).sort(newestFirst);
+export const readableNotes = async () => [...await publishedNotes(), ...await localDrafts()];
 export async function writing() {
   return (await publishedNotes()).filter((note) => !note.data.unlisted)
     .sort(newestFirst);

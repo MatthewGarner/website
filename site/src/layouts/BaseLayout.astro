@@ -4,8 +4,8 @@ import '@fontsource-variable/newsreader/standard.css';
 import '@fontsource-variable/newsreader/standard-italic.css';
 import '../styles/global.css';
 import circleHalf from '@phosphor-icons/core/assets/fill/circle-half-fill.svg?raw';
-interface Props { title?: string; description?: string; article?: boolean; }
-const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false } = Astro.props;
+interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; }
+const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false } = Astro.props;
 const pageTitle = title ? `${title} — Matthew Garner` : 'Matthew Garner';
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const current = Astro.url.pathname;
@@ -26,6 +26,7 @@ const current = Astro.url.pathname;
     </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {localDraft && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/static/icon.ico" sizes="any" />
     <link rel="alternate" type="application/rss+xml" title="Matthew Garner — Writing" href="/index.xml" />
@@ -49,7 +50,10 @@ const current = Astro.url.pathname;
           <span class="icon" aria-hidden="true" set:html={circleHalf} /><span>Appearance</span>
         </button>
       </header>
-      <main id="main" tabindex="-1"><slot /></main>
+      <main id="main" tabindex="-1">
+        {localDraft && <aside class="draft-notice" aria-label="Draft preview"><strong>Draft preview</strong><p>Only visible on this machine. This piece is excluded from published builds.</p></aside>}
+        <slot />
+      </main>
       <footer class="site-footer" aria-label="Elsewhere">
         <a href="/index.xml">RSS</a>
         <a href="https://github.com/matthewgarner">GitHub</a>

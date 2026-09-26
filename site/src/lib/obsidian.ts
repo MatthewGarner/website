@@ -3,10 +3,10 @@ import { visit } from 'unist-util-visit';
 import type { Root, PhrasingContent } from 'mdast';
 import { CONTENT_DIR, noteSources, noteHref, resolveAsset, resolveNote } from './publishing';
 
-/** Resolve only published notes; ambiguous wikilinks must never silently target the wrong page. */
-export function obsidianMarkdown({ root = CONTENT_DIR } = {}) {
+/** Resolve published notes by default; local development can explicitly include draft links. */
+export function obsidianMarkdown({ root = CONTENT_DIR, includeDrafts = false } = {}) {
   return (tree: Root, file: { path?: string }) => {
-    const notes = noteSources(root);
+    const notes = noteSources(root, { includeDrafts });
     const from = file.path ? path.relative(root, file.path).split(path.sep).join('/') : 'index.md';
     const link = (target: string) => {
       const [name, heading] = target.split('#');

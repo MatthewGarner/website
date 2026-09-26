@@ -1,10 +1,11 @@
 ---
 import { getEntry, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { isLocalDraft } from '../lib/content';
 const note = await getEntry('notes', 'index');
 if (!note) throw new Error('content/index.md is required for the About page.');
 const { Content } = await render(note);
 ---
-<BaseLayout title="About" description="I'm Matthew. I work on products in renewable energy, make small tools, and write occasionally.">
+<BaseLayout title="About" description="I'm Matthew. I work on products in renewable energy, make small tools, and write occasionally." localDraft={isLocalDraft(note)}>
   <article class="essay about"><header class="essay-heading"><h1>{note.data.title}</h1></header><div class="prose"><Content /></div></article>
 </BaseLayout>

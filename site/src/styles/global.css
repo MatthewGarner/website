@@ -87,6 +87,12 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .text-link, .projects h2 a { color: var(--accent); }
 .text-link:hover, .projects h2 a:hover { text-decoration-thickness: 2px; }
 .mobile-preview { display: none; }
+.draft-notice { margin: 28px 0; padding: 20px 24px; border: 1px dashed var(--accent); border-radius: 4px; background: var(--surface); }
+.draft-notice strong, .draft-notice h2 { color: var(--heading); font-size: 24px; }
+.draft-notice p { margin-top: 4px; color: var(--muted); font-size: 18px; }
+.draft-notice ul { padding-left: 22px; margin: 16px 0 0; }
+.draft-notice li + li { margin-top: 8px; }
+.draft-label { margin-left: 12px; color: var(--muted); font: 13px ui-monospace, monospace; }
 .projects { display: flex; justify-content: space-between; align-items: center; gap: 30px; border-top: 1px solid var(--line); margin-top: 40px; padding: 33px 5px 30px; }
 .projects h2 { font-size: 44px; line-height: 1.2; }
 .projects p { font-size: 30px; margin-top: 5px; }

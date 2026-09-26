@@ -7,6 +7,11 @@ import rehypeSlug from 'rehype-slug';
 import { obsidianMarkdown } from './src/lib/obsidian';
 import { readingProse } from './src/lib/prose';
 import { CONTENT_DIR, contentFiles, assetExtensions, noteSources, safeSlug, noteHref } from './src/lib/publishing';
+import { localDraftsEnabled } from './src/lib/drafts';
+
+const markdownProcessor = (includeDrafts = false) => unified({
+  remarkPlugins: [[obsidianMarkdown, { includeDrafts }]], rehypePlugins: [rehypeSlug, readingProse],
+});
 
 const assetDir = path.join(import.meta.dirname, '.assets');
 function syncAssets() {
@@ -24,7 +29,12 @@ function syncAssets() {
 const contentAssets: AstroIntegration = {
   name: 'obsidian-attachments',
   hooks: {
-    'astro:config:setup': () => syncAssets(),
+    'astro:config:setup': ({ command, config, updateConfig }) => {
+      syncAssets();
+      if (localDraftsEnabled(command === 'dev', config.server.host)) {
+        updateConfig({ markdown: { processor: markdownProcessor(true) } });
+      }
+    },
     'astro:server:setup': ({ server }) => {
       server.watcher.add(CONTENT_DIR);
       server.watcher.on('all', (_event, file) => {
@@ -58,7 +68,7 @@ export default defineConfig({
   redirects,
   integrations: [contentAssets],
   markdown: {
-    processor: unified({ remarkPlugins: [obsidianMarkdown], rehypePlugins: [rehypeSlug, readingProse] }),
+    processor: markdownProcessor(),
     shikiConfig: { themes: { light: 'github-light', dark: 'github-dark-default' }, defaultColor: false },
   },
   devToolbar: { enabled: false },

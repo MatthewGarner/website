@@ -1,16 +1,29 @@
 # Matthew Garner’s website
 
-[Visit the site](https://www.matthewgarner.me) · [Writing in Obsidian](site/AUTHORING.md) · [Hosting and rollback](site/HOSTING.md)
+[Live site](https://www.matthewgarner.me) · [Repository](https://github.com/MatthewGarner/website)
 
-The website uses Astro in `site/` and reads Markdown directly from `content/`. Pushing to `v5` publishes through Vercel; other branches produce protected previews. Builds check the site and its publishing behaviour before deployment.
+Write in Obsidian, save Markdown in `content/`, then commit and push to `v5` to publish. Vercel builds the Astro site and updates the live website when its checks pass. Saving a file alone does not publish it, unless your Git tool is configured to push automatically.
 
-For local development, use Node 24 and run:
+## Guides
+
+| I want to… | Read |
+| --- | --- |
+| Write or edit a piece, add images, choose homepage articles | [Writing and editing](site/AUTHORING.md) |
+| Publish, review a preview or take a piece down | [Publishing](site/PUBLISHING.md) |
+| Run the site locally, change the design or fix a build | [Running and customising the site](site/README.md) |
+| Manage hosting or roll back a deployment | [Hosting and recovery](site/HOSTING.md) |
+
+Keep `draft: true` while writing. Drafts appear under **Local drafts** on the local Writing page, with a banner on each piece. They remain excluded from builds and hosted previews.
+
+## Start a local preview
+
+Use Node.js 24. Run these commands from the repository folder (`/Users/matthew/repos/website` on this Mac):
 
 ```sh
-npm ci --prefix site
-npm --prefix site run dev
+npm ci
+npm run dev
 ```
 
-Run the complete production build with `npm --prefix site run build:release`. See [the site guide](site/README.md) for supported Markdown and design details.
+Open the local address printed in the terminal, usually http://127.0.0.1:4321. Leave the command running while editing; press **Ctrl+C** to stop it. If Codex starts it in the background, use `npm run dev -- stop` instead. [More setup and troubleshooting](site/README.md).
 
-The former Quartz implementation remains at the repository root for rollback. Its source and original licence are retained; it no longer supplies the production build.
+The website code lives in `site/`; the original Markdown stays in `content/`. Root commands run Astro. The former Quartz site is preserved in the Git tag `quartz-rollback-2026-09-26`; its old source and dependencies have been removed from the current branch.

@@ -1,10 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { writing, description, noteHref, shortDate, readingMinutes, writingType } from '../lib/content';
+import { writing, localDrafts, description, noteHref, shortDate, readingMinutes, writingType } from '../lib/content';
 const notes = await writing();
+const drafts = await localDrafts();
 ---
 <BaseLayout title="Writing" description="Occasional essays on technology, work and the things in between.">
   <header class="page-heading"><h1>Writing</h1><p>Occasional essays on technology, work and the things in between.</p></header>
+  {drafts.length > 0 && <section class="draft-notice" aria-labelledby="drafts-heading">
+    <h2 id="drafts-heading">Local drafts</h2>
+    <p>Only visible on this machine. These pieces are excluded from published builds.</p>
+    <ul>{drafts.map((note) => <li><a href={noteHref(note.id)}>{note.data.title}</a><span class="draft-label">Draft</span></li>)}</ul>
+  </section>}
   <ul class="archive-list">
     {notes.map((note) => <li>
       <div class="archive-meta">{note.data.date && <time class="date" datetime={note.data.date.toISOString()}>{shortDate(note.data.date)}</time>}<span class="writing-type">{writingType(note)}</span><span>{readingMinutes(note)} min read</span></div>
