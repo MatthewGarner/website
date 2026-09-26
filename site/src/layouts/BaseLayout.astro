@@ -5,6 +5,7 @@ import '@fontsource-variable/newsreader/standard-italic.css';
 import '../styles/global.css';
 import circleHalf from '@phosphor-icons/core/assets/fill/circle-half-fill.svg?raw';
 import ReadingTransition from '../components/ReadingTransition.astro';
+import Colophon from '../components/Colophon.astro';
 interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; }
 const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false } = Astro.props;
 const pageTitle = title ? `${title} — Matthew Garner` : 'Matthew Garner';
@@ -55,10 +56,13 @@ const current = Astro.url.pathname;
         {localDraft && <aside class="draft-notice" aria-label="Draft preview"><strong>Draft preview</strong><p>Only visible on this machine. This piece is excluded from published builds.</p></aside>}
         <slot />
       </main>
-      <footer class="site-footer" aria-label="Elsewhere">
-        <a href="/index.xml">RSS</a>
-        <a href="https://github.com/matthewgarner">GitHub</a>
-        <a href="https://www.linkedin.com/in/matthew-garner-uk/">LinkedIn</a>
+      <footer class="site-footer">
+        <nav class="footer-links" aria-label="Elsewhere">
+          <a href="/index.xml">RSS</a>
+          <a href="https://github.com/matthewgarner">GitHub</a>
+          <a href="https://www.linkedin.com/in/matthew-garner-uk/">LinkedIn</a>
+        </nav>
+        <Colophon />
       </footer>
     </div>
     <script>

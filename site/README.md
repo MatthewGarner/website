@@ -91,6 +91,7 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 | About heading, biography and portrait reference | `content/index.md` |
 | Homepage introduction and Tools link | [src/pages/index.astro](src/pages/index.astro) |
 | Homepage headline and its pointer/touch response | [src/components/ResponsiveHeadline.astro](src/components/ResponsiveHeadline.astro) |
+| “About this site” and its typography playground | [src/components/Colophon.astro](src/components/Colophon.astro) |
 | Site name, navigation, footer links, default description and theme toggle | [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) |
 | Colours, spacing, typography, mobile layouts and transitions | [src/styles/global.css](src/styles/global.css) |
 | Article layout, reading time and “Keep reading” | [src/pages/[...slug].astro](src/pages/%5B...slug%5D.astro) |
@@ -105,6 +106,8 @@ Appearance follows the reader’s system until they toggle it, then remembers th
 
 The headline responds to the pointer and ripples on a touch tap, then rests. Paper previews lift into place and expand into an article alongside its title. Clicking Appearance reveals the new theme from the icon; automatic system changes use a quiet crossfade. Reduced motion keeps everything still. These effects add no authoring requirements or animation dependencies.
 
+**About this site** in the footer opens a small typography playground. Readers can edit the specimen, choose Oswald or Newsreader, adjust its weight and change its paper colour. **Another phrase** cycles the phrases defined in `Colophon.astro`; **Reset** restores the defaults. These changes stay within the specimen and are neither saved nor sent anywhere. Escape closes the panel. Without JavaScript, the site note and editable specimen still work; reduced motion removes the effects.
+
 ### Reading interactions and browser checks
 
 Opening featured writing carries its title into the article in browsers with native page transitions. Footnotes open beside the reference; Escape or Close returns focus. Selecting prose offers **Copy quote & link**, with a manual copy field if clipboard access is unavailable. These enhancements need no extra Markdown properties. Plain navigation and footnote links remain available without JavaScript or the relevant browser feature; reduced motion skips animation.
@@ -118,7 +121,7 @@ npm run test:browser
 
 The suite builds an isolated copy with the reading sample, never adding fixtures to `content/`. It checks keyboard and touch controls, reduced motion, missing features, blocked storage and clipboard access, light/dark contrast, and print output in Chromium and WebKit. GitHub runs it automatically. Print screenshots and the Chromium PDF are written under `site/test-results/`; failed runs retain traces. Physical devices and screen-reader use still benefit from occasional manual checks.
 
-Interaction code lives in `src/components/ResponsiveHeadline.astro`, `ReadingTransition.astro`, `Footnotes.astro` and `QuotePassage.astro`, plus `src/scripts/previews.ts` and `appearance.ts`. Print and shared motion rules live in `src/styles/global.css`.
+Interaction code lives in `src/components/ResponsiveHeadline.astro`, `ReadingTransition.astro`, `Footnotes.astro`, `QuotePassage.astro` and `Colophon.astro`, plus `src/scripts/previews.ts` and `appearance.ts`. Print and shared motion rules live in `src/styles/global.css`.
 
 Do not hand-edit `site/dist/`, `site/.assets/`, `site/.astro/` or `.vercel/output/`; builds regenerate them. Publishing rules live in `src/lib/publishing.ts`, Markdown handling in `src/lib/obsidian.ts` and `src/lib/markdown.ts`, and rendering configuration in `astro.config.ts`.
 
