@@ -1,4 +1,9 @@
 <!-- Register before first paint; navigation remains an ordinary document request. -->
+<style is:inline>
+  /* The incoming page can be revealed before external CSS arrives. Opt in now. */
+  @view-transition { navigation: auto; }
+  @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+</style>
 <script is:inline>
   (() => {
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -53,7 +58,6 @@
   })();
 </script>
 <style is:global>
-  @view-transition { navigation: auto; }
   :root[data-reading-transition]::view-transition-group(reading-title) {
     z-index: 2;
     animation-duration: 520ms;
@@ -82,7 +86,6 @@
   :root[data-reading-transition]::view-transition-old(root),
   :root[data-reading-transition]::view-transition-new(root) { animation-duration: 180ms; }
   @media (prefers-reduced-motion: reduce) {
-    @view-transition { navigation: none; }
     ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
   }
 </style>

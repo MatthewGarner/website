@@ -24,6 +24,11 @@ test('preview holds its place and the title travels into the article, then clean
     });
   });
   await page.goto('/');
+  // CI exposed a first-render race when the destination stylesheet arrived late.
+  await page.route('**/*.css', async route => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    await route.continue();
+  });
   const height = await page.locator('.preview-panel').evaluate(el => el.getBoundingClientRect().height);
   await page.getByRole('button', { name: 'Preview Drifting', exact: true }).press('Enter');
   await expect(page.locator('#preview-drifting')).toHaveAttribute('aria-hidden', 'false');
