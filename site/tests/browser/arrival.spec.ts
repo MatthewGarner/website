@@ -26,7 +26,7 @@ test('a fresh homepage typesets in sequence and fans its paper without moving li
   await page.screenshot({ path: testInfo.outputPath('home-arrival-settled.png') });
 });
 
-test('returning and reloading preserve the page without replaying the entrance', async ({ page }) => {
+test('Back and a scrolled reload preserve the page without replaying the entrance', async ({ page }) => {
   await recordArrival(page);
   await page.goto('/');
   await expect(page.locator('[data-home-arrival]')).toHaveCount(1);

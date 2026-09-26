@@ -4,48 +4,66 @@
     const root = document.documentElement;
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     const navigation = performance.getEntriesByType('navigation')[0];
+    const reloading = navigation?.type === 'reload';
     const internal = document.referrer && new URL(document.referrer).origin === location.origin;
-    let seen = false;
-    try { seen = sessionStorage.getItem('mg:home-arrival') === 'seen'; } catch {}
     // A restored page or a deliberate destination should never run an entrance over the reader's place.
-    if (seen || internal || navigation?.type === 'back_forward' || location.hash || motion.matches || document.hidden) return;
-    try { sessionStorage.setItem('mg:home-arrival', 'seen'); } catch {}
-    root.setAttribute('data-home-arrival', '');
+    if ((internal && !reloading) || navigation?.type === 'back_forward' || location.hash || motion.matches) return;
+    let shown = !reloading;
+    let started = false;
+    let finished = false;
     let timer;
+    function start() {
+      if (!shown || started || finished || document.hidden) return;
+      if (motion.matches || scrollY > 0) { settle(); return; }
+      started = true;
+      root.setAttribute('data-home-arrival', '');
+      // A cold WebKit compositor can lag page scripts. Actual animation completion
+      // controls cleanup; this timer only handles unavailable animation events.
+      timer = setTimeout(settle, 5000);
+    }
     function settle() {
+      finished = true;
       root.removeAttribute('data-home-arrival');
       clearTimeout(timer);
       for (const type of ['pointerdown', 'keydown', 'wheel', 'touchstart']) document.removeEventListener(type, settle, true);
-      removeEventListener('scroll', settle);
-      removeEventListener('resize', settle);
+      removeEventListener('scroll', onScroll);
       removeEventListener('pagehide', settle);
       document.removeEventListener('visibilitychange', onVisibility);
       document.removeEventListener('home-arrival-settle', settle);
       document.removeEventListener('animationend', onAnimationEnd);
       motion.removeEventListener('change', settle);
     }
-    function onVisibility() { if (document.hidden) settle(); }
+    function onVisibility() {
+      // A new background tab still deserves its first entrance when it becomes visible.
+      if (!document.hidden) start();
+      else if (started) settle();
+    }
+    function onScroll() { if (scrollY !== 0) settle(); }
     function onAnimationEnd(event) {
       if (!event.animationName.startsWith('arrive-')) return;
       const animations = document.getAnimations?.();
       if (animations && !animations.some(animation => animation.animationName?.startsWith('arrive-') && animation.playState !== 'finished')) settle();
     }
     for (const type of ['pointerdown', 'keydown', 'wheel', 'touchstart']) document.addEventListener(type, settle, { capture: true, passive: true });
-    addEventListener('scroll', settle, { passive: true });
-    addEventListener('resize', settle, { passive: true });
+    addEventListener('scroll', onScroll, { passive: true });
+    // Initial viewport and browser-chrome resize events are not reader interaction.
+    // CSS already adapts these animations to the current viewport without cancellation.
     addEventListener('pagehide', settle);
     document.addEventListener('visibilitychange', onVisibility);
     motion.addEventListener('change', settle);
     document.addEventListener('home-arrival-settle', settle);
     document.addEventListener('animationend', onAnimationEnd);
     // Do not replay after a bfcache restore, including browsers without navigation timing.
-    addEventListener('pageshow', (event) => { if (event.persisted) settle(); });
+    addEventListener('pageshow', (event) => {
+      if (event.persisted) { settle(); return; }
+      // On reload, let the browser restore its scroll position before deciding to animate.
+      shown = true;
+      start();
+    });
     document.addEventListener('DOMContentLoaded', () => {
-      if (scrollY > 0) { settle(); return; }
-      // A cold WebKit compositor can start later than DOMContentLoaded. Let the actual
-      // CSS timelines finish; this timer only cleans up if animation events are unavailable.
-      timer = setTimeout(settle, 5000);
+      if (scrollY > 0) settle();
     }, { once: true });
+    start();
   })();
 </script>
 <style is:global>
