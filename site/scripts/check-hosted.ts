@@ -14,10 +14,10 @@ assert.ok(production
   : deployment.hostname.endsWith('.vercel.app'), 'Pass the exact preview URL, or a live domain with --production.');
 const run = promisify(execFile);
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'astro-hosted-'));
-const results: { path: string; status: number; location?: string }[] = [];
+const results: { origin: string; path: string; status: number; location?: string }[] = [];
 let sequence = 0;
 
-async function get(urlPath: string, expected: number) {
+async function get(urlPath: string, expected: number, origin = deployment.origin): Promise<{ headers: Record<string, string>; body: string }> {
   const id = sequence++;
   const headersFile = path.join(directory, `${id}.headers`);
   const bodyFile = path.join(directory, `${id}.body`);
@@ -27,7 +27,7 @@ async function get(urlPath: string, expected: number) {
     '--output', bodyFile, '--write-out', '%{http_code}'];
   // Live checks deliberately use unauthenticated requests to catch accidental protection.
   const { stdout } = await run(production ? 'curl' : 'npx', production
-    ? [new URL(urlPath, deployment).href, ...curlOptions]
+    ? [new URL(urlPath, origin).href, ...curlOptions]
     : ['--yes', 'vercel@60.1.3', 'curl', urlPath, '--deployment', deployment.origin,
       '--scope', 'matthew-garners-projects', '--', ...curlOptions], { maxBuffer: 2 * 1024 * 1024 });
   const status = Number(stdout.trim());
@@ -36,7 +36,15 @@ async function get(urlPath: string, expected: number) {
     const colon = line.indexOf(':');
     return [line.slice(0, colon).toLowerCase(), line.slice(colon + 1).trim()];
   }));
-  results.push({ path: urlPath, status, ...(headers.location ? { location: headers.location } : {}) });
+  results.push({ origin, path: urlPath, status, ...(headers.location ? { location: headers.location } : {}) });
+  if (production && origin === 'https://matthewgarner.me') {
+    // The existing domain-level redirect runs before application routes, including
+    // 404s and aliases. Validate its destination, then test the canonical response.
+    const canonical = 'https://www.matthewgarner.me';
+    assert.equal(status, 308, `The apex domain must redirect ${urlPath} to www.`);
+    assert.equal(headers.location, new URL(urlPath, canonical).href);
+    return get(urlPath, expected, canonical);
+  }
   assert.equal(status, expected, `${urlPath}: expected ${expected}, got ${status}`);
   return { headers, body: fs.readFileSync(bodyFile, 'utf8') };
 }
@@ -63,6 +71,7 @@ try {
   ]);
   for (const resource of resources) if (resource.status === 'rejected') throw resource.reason;
   const feed = await get('/index.xml', 200);
+  if (production && deployment.hostname === 'matthewgarner.me') await get('/index.xml?migration-check=1', 200);
   assert.match(feed.headers['content-type'], /application\/rss\+xml/);
   const guids = [...feed.body.matchAll(/<guid[^>]*>(.*?)<\/guid>/g)].map((match) => match[1].replaceAll('&apos;', "'").replaceAll('&#39;', "'"));
   const legacy: string[] = JSON.parse(fs.readFileSync(new URL('../tests/fixtures/legacy-rss.json', import.meta.url), 'utf8'));

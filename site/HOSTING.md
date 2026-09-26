@@ -1,6 +1,6 @@
 # Publishing and rollback
 
-Production: [www.matthewgarner.me](https://www.matthewgarner.me), also served at [matthewgarner.me](https://matthewgarner.me).
+Production: [www.matthewgarner.me](https://www.matthewgarner.me), with [matthewgarner.me](https://matthewgarner.me) permanently redirecting to `www` while preserving the path and query string.
 
 The existing Vercel project is `matthew-garners-projects/my-web-quartz` (`prj_8vVA6l6X8f3iSH5QqGmLr7oe9fuj`). Its Git connection publishes `MatthewGarner/website`, production branch `v5`. No DNS change is needed.
 
@@ -26,7 +26,7 @@ npm run check:hosted -- https://www.matthewgarner.me --production
 npm run check:hosted -- https://matthewgarner.me --production
 ```
 
-Preview checks use the authenticated Vercel CLI and require `noindex`. Production checks use ordinary public requests and reject `noindex`. Both check articles, aliases, feed identities, public assets and missing/source-file responses. Small interaction scripts may be inline in HTML, so an absent script `src` is not itself a failure.
+Preview checks use the authenticated Vercel CLI and require `noindex`. Production checks use ordinary public requests and reject `noindex`. The apex domain’s existing 308 redirect is validated before checking the destination; expecting a direct 200 at the apex would incorrectly fail a healthy deployment. Both check articles, aliases, feed identities, public assets and missing/source-file responses. Small interaction scripts may be inline in HTML, so an absent script `src` is not itself a failure.
 
 For an occasional local prebuilt preview, `npm run build:vercel` creates `site/.vercel/output/`. Link `site/` to the existing project first, then deploy with `npx --yes vercel@60.1.3 deploy --prebuilt --target preview --scope matthew-garners-projects --project prj_8vVA6l6X8f3iSH5QqGmLr7oe9fuj --non-interactive --yes`. Local `.vercel/` and `.env*` files are ignored and must stay out of Git.
 
@@ -41,6 +41,8 @@ For an occasional local prebuilt preview, `npm run build:vercel` creates `site/.
 | A protected or non-indexable preview could become the live experience | Check both live domains without credentials, including indexing headers, after cutover. |
 
 Attachments in public content folders are copied even when referenced only by a draft. Keep private attachments outside this public repository. `unlisted` is discoverability, not access control.
+
+The migration merged in [PR #84](https://github.com/MatthewGarner/website/pull/84), commit `f7926fb87882366473dd577a94e7a90e92ebce32`. Its first production deployment, `dpl_8XSTDCeFgqR6yMX23cJ3TTwxFRTp`, became ready on 26 September 2026. The clean GitHub/Vercel builds passed all 10 tests. Public HTTP checks passed on both domains, including preserved RSS identities and apex redirects; the runtime dependency audit found no known vulnerabilities.
 
 ## Rollback
 

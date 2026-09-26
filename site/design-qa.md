@@ -50,3 +50,11 @@ Replaced the menu with one button: system appearance by default, then a remember
 Local browser checks passed for the current system default, clicks, Space, rapid double-clicks, mobile activation, and persistence through article navigation and reload. The mobile target is 44px tall and the document fits a 390px viewport. Console errors: none. Screenshot: `qa/theme-toggle-mobile-dark.png`. Reduced-motion and older-browser branches were not emulated. Nine tests and the Astro check passed; the final stylesheet rebuild passed.
 
 Updated preview: [single-button theme toggle](https://my-web-quartz-8nhkewvox-matthew-garners-projects.vercel.app), deployment `dpl_CmK2fihn4BEPkmGgtFVFGhzmYW6H`. Production remains on Quartz.
+
+## Production migration — 26 September 2026
+
+Astro is live at https://www.matthewgarner.me through the Git publishing workflow, merged in PR #84. Production deployment `dpl_8XSTDCeFgqR6yMX23cJ3TTwxFRTp` came from `f7926fb87882366473dd577a94e7a90e92ebce32`. Both clean remote builds passed the 10 publishing tests and type checks. The hosted preview passed 23 HTTP checks; production passed those checks at `www` and validated the apex domain’s permanent redirects, including query-string preservation. All five original RSS article GUIDs are preserved.
+
+Live browser checks passed for desktop dark appearance, a 390px mobile layout without horizontal overflow, expanding the Drifting preview, opening the note and retaining the chosen appearance. The initial live visit followed the light system appearance. The previous preview browser sign-in limitation no longer applies to the public domain. The unchanged reduced-motion and older-browser branches remain un-emulated.
+
+The migration review found and fixed an RSS identity change and a clean-build dependency accidentally supplied by the old Quartz installation. The live-domain checker now accounts for the existing apex-to-www redirect. Hosting configuration, remaining public-attachment behaviour and rollback are documented in `HOSTING.md`.
