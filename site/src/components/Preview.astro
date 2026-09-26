@@ -1,12 +1,12 @@
 ---
-import { description, excerpt, noteHref, readLabel, type Note } from '../lib/content';
+import { description, excerpt, noteHref, readLabel, writingType, readingMinutes, type Note } from '../lib/content';
 interface Props { note: Note; }
 const { note } = Astro.props;
 ---
 <div class="preview-copy">
-  <p class="eyebrow">Preview</p>
-  <h3>{note.data.title}</h3>
+  <p class="preview-meta"><span class="writing-type">{writingType(note)}</span><span>{readingMinutes(note)} min read</span></p>
+  <h3 data-reading-title={noteHref(note.id)}>{note.data.title}</h3>
   {note.data.description && <p class="preview-description">{description(note)}</p>}
   <p class="preview-excerpt">{excerpt(note)}</p>
-  <a class="text-link" href={noteHref(note.id)}>{readLabel(note)}</a>
+  <a class="text-link" href={noteHref(note.id)} data-reading-link>{readLabel(note)} <span aria-hidden="true">→</span></a>
 </div>

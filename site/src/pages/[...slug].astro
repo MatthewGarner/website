@@ -3,6 +3,8 @@ import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { readableNotes, isLocalDraft, writing, description, noteHref, longDate, readingMinutes, writingType } from '../lib/content';
 import arrowLeft from '@phosphor-icons/core/assets/regular/arrow-left.svg?raw';
+import Footnotes from '../components/Footnotes.astro';
+import QuotePassage from '../components/QuotePassage.astro';
 export async function getStaticPaths() {
   return (await readableNotes()).map((note) => ({ params: { slug: note.id }, props: { note } }));
 }
@@ -16,11 +18,13 @@ const next = others[(current + 1) % others.length];
   <article class:list={['essay', { 'essay-note': writingType(note) === 'note' }]}>
     <a class="back-link" href="/writing"><span class="icon" aria-hidden="true" set:html={arrowLeft} />All writing</a>
     <header class="essay-heading">
-      <h1>{note.data.title}</h1>
+      <h1 data-reading-title={noteHref(note.id)}>{note.data.title}</h1>
       {note.data.description && <p class="essay-description">{description(note)}</p>}
       <p class="essay-meta"><span class="writing-type">{writingType(note)}</span>{note.data.date && <time datetime={note.data.date.toISOString()}>{longDate(note.data.date)}</time>}<span>{readingMinutes(note)} min read</span></p>
     </header>
     <div class="prose"><Content /></div>
+    <Footnotes />
+    <QuotePassage title={note.data.title} path={noteHref(note.id)} localDraft={isLocalDraft(note)} />
     {next && next.id !== note.id && <nav class="next-essay" aria-label="More writing"><span class="eyebrow">Keep reading</span><a href={noteHref(next.id)}>{next.data.title}</a></nav>}
   </article>
 </BaseLayout>

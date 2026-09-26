@@ -1,25 +1,28 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Preview from '../components/Preview.astro';
-import { selectedWriting, shortDate, noteHref } from '../lib/content';
+import { selectedWriting, shortDate, noteHref, writingType } from '../lib/content';
 const notes = await selectedWriting();
 ---
 <BaseLayout>
   <section class="intro" aria-labelledby="intro-title">
     <h1 id="intro-title">A few things<br />I’ve been<br />thinking about.</h1>
-    <p>I work on products in renewable energy, make small tools, and write occasionally.</p>
+    <div class="intro-copy">
+      <p>I work on products in renewable energy, and write about technology, attention, and life beyond a screen.</p>
+      <a href="/about">A little more about me <span aria-hidden="true">→</span></a>
+    </div>
   </section>
   <section class="writing-preview" aria-labelledby="writing-title">
     <div class="selected-writing">
-      <div class="section-heading"><h2 id="writing-title">Writing</h2><a class="all-writing" href="/writing">All writing</a></div>
+      <div class="section-heading"><h2 id="writing-title">Selected writing</h2><a class="all-writing" href="/writing">All writing <span aria-hidden="true">→</span></a></div>
       <ul class="writing-list">
         {notes.map((note, index) => <li class:list={['writing-row', { 'is-selected': index === 0 }]} data-note={note.id}>
           <div class="row-heading">
-            <a class="article-title" href={noteHref(note.id)}>{note.data.title}</a>
+            <a class="article-title" href={noteHref(note.id)} data-reading-title={noteHref(note.id)} data-reading-link>{note.data.title}</a>
             <button class="preview-button" type="button" aria-label={`Preview ${note.data.title}`} aria-pressed={index === 0 ? 'true' : 'false'} aria-controls={`preview-${note.id}`} data-preview={note.id}>Preview</button>
           </div>
-          <time class="date" datetime={note.data.date?.toISOString()}>{shortDate(note.data.date)}</time>
-          <details class="mobile-preview">
+          <p class="writing-row-meta"><span class="writing-type">{writingType(note)}</span>{note.data.date && <time datetime={note.data.date.toISOString()}>{shortDate(note.data.date)}</time>}</p>
+          <details class="mobile-preview" name="selected-writing">
             <summary>Preview<span class="sr-only"> {note.data.title}</span></summary>
             <Preview note={note} />
           </details>
@@ -27,25 +30,47 @@ const notes = await selectedWriting();
       </ul>
     </div>
     <aside class="preview-panel" aria-label="Selected writing preview">
-      {notes.map((note, index) => <div id={`preview-${note.id}`} data-panel={note.id} hidden={index !== 0}><Preview note={note} /></div>)}
+      {notes.map((note, index) => <div id={`preview-${note.id}`} data-panel={note.id} inert={index !== 0} aria-hidden={index !== 0 ? 'true' : 'false'}><Preview note={note} /></div>)}
       <span class="sr-only" aria-live="polite" id="preview-announcement"></span>
     </aside>
   </section>
-  <section class="projects" id="projects" aria-labelledby="projects-title">
-    <div><h2 id="projects-title">Also making: <a href="https://tools.matthewgarner.me">Tools</a></h2><p>Small tools for thinking clearly.</p></div>
-    <a class="text-link" href="https://tools.matthewgarner.me">Explore tools</a>
-  </section>
+  <aside class="tools-note" id="projects" aria-label="Small tools">
+    <p>I also make <a href="https://tools.matthewgarner.me">small tools for thinking clearly <span aria-hidden="true">↗</span></a>.</p>
+  </aside>
 </BaseLayout>
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-preview]');
   const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let previewAnimation: Animation | undefined;
+  function reveal(panel: HTMLElement) {
+    previewAnimation?.cancel();
+    if (reducedMotion.matches || typeof panel.animate !== 'function') return;
+    previewAnimation = panel.animate(
+      [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: 240, easing: 'cubic-bezier(.22, 1, .36, 1)' },
+    );
+  }
   buttons.forEach((button) => button.addEventListener('click', () => {
+    if (button.getAttribute('aria-pressed') === 'true') return;
     buttons.forEach((item) => {
       const selected = item === button;
       item.setAttribute('aria-pressed', String(selected));
       item.closest('.writing-row')?.classList.toggle('is-selected', selected);
     });
-    panels.forEach((panel) => { panel.hidden = panel.dataset.panel !== button.dataset.preview; });
+    panels.forEach((panel) => {
+      const selected = panel.dataset.panel === button.dataset.preview;
+      panel.inert = !selected;
+      panel.setAttribute('aria-hidden', String(!selected));
+      if (selected) reveal(panel);
+    });
     document.querySelector('#preview-announcement')!.textContent = button.getAttribute('aria-label')!.replace('Preview ', 'Previewing ');
   }));
+  document.querySelectorAll<HTMLDetailsElement>('.mobile-preview').forEach((details) => {
+    details.addEventListener('toggle', () => {
+      if (details.open) reveal(details.querySelector<HTMLElement>('.preview-copy')!);
+    });
+  });
+  reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) previewAnimation?.cancel(); });
+  document.querySelector('.writing-preview')?.setAttribute('data-preview-ready', '');
 </script>

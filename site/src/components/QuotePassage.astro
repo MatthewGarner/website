@@ -1,0 +1,135 @@
+---
+interface Props { title: string; path: string; localDraft: boolean; }
+const { title, path, localDraft } = Astro.props;
+// Astro's built URL can gain a trailing slash; use the content's canonical route.
+const url = new URL(path, localDraft ? Astro.url.origin : Astro.site).href;
+---
+<aside class="quote-actions" aria-label="Share selected text" data-quote-title={title} data-quote-url={url} hidden>
+  <div class="quote-buttons">
+    <button type="button" data-copy-quote>Copy quote &amp; link <span aria-hidden="true">↗</span></button>
+    <button type="button" class="quote-dismiss" aria-label="Dismiss quote tools">×</button>
+  </div>
+  <p role="status" aria-live="polite" class="quote-status"></p>
+  <div class="quote-manual" hidden>
+    <label for="quote-copy-text">Copy this quote</label>
+    <textarea id="quote-copy-text" readonly rows="5"></textarea>
+  </div>
+</aside>
+<script>
+  import { passageLink } from '../lib/passage';
+  const toolbar = document.querySelector<HTMLElement>('.quote-actions')!;
+  const prose = document.querySelector<HTMLElement>('.essay > .prose')!;
+  const copy = toolbar.querySelector<HTMLButtonElement>('[data-copy-quote]')!;
+  const dismiss = toolbar.querySelector<HTMLButtonElement>('.quote-dismiss')!;
+  const status = toolbar.querySelector<HTMLElement>('[role="status"]')!;
+  const manual = toolbar.querySelector<HTMLElement>('.quote-manual')!;
+  const field = toolbar.querySelector<HTMLTextAreaElement>('textarea')!;
+  let passage: { text: string; link: string; range: Range } | undefined;
+  let timer: ReturnType<typeof setTimeout>;
+  let copying = false;
+  let dismissedRange: Range | undefined;
+
+  function close(rememberSelection = false) {
+    clearTimeout(timer);
+    if (rememberSelection && passage) dismissedRange = passage.range.cloneRange();
+    toolbar.hidden = true;
+    manual.hidden = true;
+    passage = undefined;
+    status.textContent = '';
+  }
+  function place() {
+    if (!passage || toolbar.hidden) return;
+    const rect = passage.range.getBoundingClientRect();
+    const margin = 12;
+    const size = toolbar.getBoundingClientRect();
+    const mobile = matchMedia('(max-width: 760px)').matches;
+    const view = window.visualViewport;
+    const bottom = (view?.offsetTop ?? 0) + (view?.height ?? innerHeight);
+    const left = mobile ? margin : Math.max(margin, Math.min(rect.left, innerWidth - size.width - margin));
+    const top = mobile ? bottom - size.height - margin : Math.max(margin, Math.min(rect.bottom + 10, bottom - size.height - margin));
+    toolbar.style.left = `${left}px`;
+    toolbar.style.top = `${top}px`;
+  }
+  function selectionChanged() {
+    if (copying || toolbar.contains(document.activeElement)) return;
+    const selection = getSelection();
+    if (!selection || selection.isCollapsed || !selection.rangeCount) { dismissedRange = undefined; close(); return; }
+    const range = selection.getRangeAt(0);
+    // Keep an unchanged selection from reopening tools the reader dismissed.
+    if (dismissedRange && range.compareBoundaryPoints(Range.START_TO_START, dismissedRange) === 0 && range.compareBoundaryPoints(Range.END_TO_END, dismissedRange) === 0) return;
+    if (!prose.contains(range.startContainer) || !prose.contains(range.endContainer)) { close(); return; }
+    const text = selection.toString().trim();
+    if (text.length < 8) { close(); return; }
+    // Skip footnote controls and keep generated quotation tools outside the prose.
+    const parent = range.startContainer.parentElement;
+    if (parent?.closest('[data-footnotes], pre')) { close(); return; }
+    let anchor = 'main';
+    for (const heading of prose.querySelectorAll<HTMLElement>('h2[id], h3[id], h4[id]')) {
+      if (heading === parent || (heading.compareDocumentPosition(range.startContainer) & Node.DOCUMENT_POSITION_FOLLOWING)) anchor = heading.id;
+    }
+    passage = { text, link: passageLink(toolbar.dataset.quoteUrl!, text, anchor), range: range.cloneRange() };
+    manual.hidden = true;
+    status.textContent = '';
+    copy.disabled = false;
+    toolbar.hidden = false;
+    place();
+  }
+  document.addEventListener('selectionchange', () => {
+    clearTimeout(timer);
+    timer = setTimeout(selectionChanged, 180);
+  });
+  // Preserve mouse selection. Cancelling a touch pointerdown suppresses Safari's
+  // eventual click, so touch and keyboard must retain their native activation.
+  toolbar.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && (event.target as Element).closest('button')) event.preventDefault();
+  });
+  copy.addEventListener('click', async () => {
+    if (!passage) return;
+    const text = `“${passage.text}”\n\n— Matthew Garner, ${toolbar.dataset.quoteTitle}\n${passage.link}`;
+    copying = true;
+    copy.disabled = true;
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(text);
+      status.textContent = 'Copied — ready to share.';
+    } catch {
+      manual.hidden = false;
+      field.value = text;
+      status.textContent = 'Automatic copying is unavailable. Copy the text below.';
+      field.focus({ preventScroll: true });
+      field.select();
+    } finally {
+      copying = false;
+      copy.disabled = false;
+      place();
+    }
+  });
+  dismiss.addEventListener('click', () => {
+    const hadFocus = toolbar.contains(document.activeElement);
+    close(true);
+    if (hadFocus) document.querySelector<HTMLElement>('#main')?.focus({ preventScroll: true });
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !toolbar.hidden) { event.preventDefault(); dismiss.click(); }
+  });
+  document.addEventListener('pointerdown', (event) => {
+    if (!toolbar.hidden && !toolbar.contains(event.target as Node)) close(true);
+  });
+  addEventListener('scroll', place, { passive: true });
+  addEventListener('resize', place);
+  window.visualViewport?.addEventListener('resize', place);
+</script>
+<style>
+  .quote-actions { position: fixed; z-index: 20; max-width: min(380px, calc(100vw - 24px)); padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); box-shadow: 0 8px 28px #0002; font-size: 18px; }
+  .quote-buttons { display: flex; align-items: center; gap: 10px; }
+  .quote-buttons button { min-height: 44px; border: 0; border-radius: 3px; background: transparent; color: var(--accent); padding: 8px 12px; }
+  .quote-buttons button:hover { background: var(--surface); }
+  .quote-buttons button:disabled { opacity: .65; }
+  .quote-buttons .quote-dismiss { margin-left: auto; font: 24px system-ui; width: 44px; padding: 0; color: var(--muted); }
+  .quote-status:not(:empty) { padding: 4px 12px 8px; font-size: 16px; }
+  .quote-manual { padding: 4px 12px 12px; }
+  .quote-manual label { display: block; margin-bottom: 6px; }
+  .quote-manual textarea { width: 100%; max-height: 35vh; padding: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 16px/1.4 var(--serif); resize: vertical; }
+  @media (max-width: 760px) { .quote-actions { width: calc(100vw - 24px); } }
+  @media print { .quote-actions { display: none !important; } }
+</style>

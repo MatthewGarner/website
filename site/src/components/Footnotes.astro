@@ -1,0 +1,134 @@
+<div id="footnote-preview" class="footnote-panel" popover="auto" role="dialog" aria-modal="false" aria-labelledby="footnote-preview-title" hidden>
+  <div class="footnote-panel-heading">
+    <span id="footnote-preview-title">Footnote</span>
+    <button type="button" aria-label="Close footnote"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="footnote-panel-body"></div>
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('#footnote-preview')!;
+  // Keep ordinary fragment navigation when the native popover API is unavailable.
+  if (typeof panel.showPopover === 'function') {
+    const body = panel.querySelector<HTMLElement>('.footnote-panel-body')!;
+    const title = panel.querySelector<HTMLElement>('#footnote-preview-title')!;
+    const close = panel.querySelector<HTMLButtonElement>('button')!;
+    let reference: HTMLAnchorElement | undefined;
+    let frame = 0;
+
+    const dismiss = (restoreFocus = false) => {
+      const previous = reference;
+      panel.hidePopover();
+      if (restoreFocus) previous?.focus({ preventScroll: true });
+    };
+
+    function position() {
+      frame = 0;
+      if (!reference) return;
+      const viewport = window.visualViewport;
+      const left = viewport?.offsetLeft ?? 0;
+      const top = viewport?.offsetTop ?? 0;
+      const width = viewport?.width ?? document.documentElement.clientWidth;
+      const height = viewport?.height ?? window.innerHeight;
+      const anchor = reference.getBoundingClientRect();
+      const margin = 16;
+      const gap = 10;
+      if (anchor.bottom < top || anchor.top > top + height) {
+        dismiss();
+        return;
+      }
+      panel.style.width = `${Math.min(380, width - margin * 2)}px`;
+      const below = top + height - margin - anchor.bottom - gap;
+      const above = anchor.top - top - margin - gap;
+      panel.style.maxHeight = `${Math.min(420, height - margin * 2)}px`;
+      const useBelow = below >= panel.offsetHeight || below >= above;
+      panel.style.maxHeight = `${Math.max(0, Math.min(420, useBelow ? below : above))}px`;
+      panel.style.left = `${Math.max(left + margin, Math.min(anchor.left - 20, left + width - panel.offsetWidth - margin))}px`;
+      panel.style.top = `${useBelow ? anchor.bottom + gap : anchor.top - panel.offsetHeight - gap}px`;
+    }
+
+    const schedulePosition = () => {
+      if (reference && !frame) frame = requestAnimationFrame(position);
+    };
+
+    panel.addEventListener('beforetoggle', (event) => {
+      if ((event as ToggleEvent).newState !== 'closed') return;
+      reference?.setAttribute('aria-expanded', 'false');
+      reference = undefined;
+    });
+    close.addEventListener('click', () => dismiss(true));
+    document.addEventListener('keydown', (event) => {
+      if (reference && event.key === 'Escape') {
+        event.preventDefault();
+        dismiss(true);
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = (event.target as Element).closest<HTMLAnchorElement>('.prose a[data-footnote-ref]');
+      if (!link) return;
+      const url = new URL(link.href);
+      if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search) return;
+      let source: HTMLElement | null;
+      try { source = document.getElementById(decodeURIComponent(url.hash.slice(1))); } catch { return; }
+      if (!source?.closest('.prose [data-footnotes]')) return;
+      event.preventDefault();
+      if (reference === link) { dismiss(true); return; }
+      if (reference) dismiss();
+      const content = source.cloneNode(true) as HTMLElement;
+      content.querySelectorAll('[data-footnote-backref]').forEach((backlink) => backlink.remove());
+      content.querySelectorAll('[id], [autofocus]').forEach((element) => {
+        element.removeAttribute('id');
+        element.removeAttribute('autofocus');
+      });
+      body.replaceChildren(...content.childNodes);
+      title.textContent = `Footnote ${link.textContent?.trim() || ''}`.trim();
+      reference = link;
+      link.setAttribute('aria-controls', panel.id);
+      link.setAttribute('aria-haspopup', 'dialog');
+      link.setAttribute('aria-expanded', 'true');
+      panel.hidden = false;
+      panel.showPopover();
+      position();
+      body.scrollTop = 0;
+      close.focus({ preventScroll: true });
+    });
+    window.addEventListener('resize', schedulePosition, { passive: true });
+    document.addEventListener('scroll', schedulePosition, { passive: true, capture: true });
+    window.visualViewport?.addEventListener('resize', schedulePosition, { passive: true });
+    window.visualViewport?.addEventListener('scroll', schedulePosition, { passive: true });
+  }
+</script>
+
+<style>
+  .footnote-panel {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--accent);
+    border-radius: 4px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 12px 36px rgb(0 0 0 / .16);
+    font-size: 19px;
+    line-height: 1.45;
+  }
+  .footnote-panel:popover-open { display: grid; grid-template-rows: auto minmax(0, 1fr); animation: footnote-appear 160ms ease-out; }
+  .footnote-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 12px 4px 20px; }
+  .footnote-panel-heading > span { color: var(--muted); font-family: var(--display); text-transform: uppercase; font-size: 13px; letter-spacing: .06em; }
+  .footnote-panel button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 3px; background: transparent; color: var(--muted); font-size: 28px; line-height: 1; }
+  .footnote-panel button:hover { color: var(--accent); background: var(--surface); }
+  .footnote-panel button:focus-visible { outline-offset: -3px; }
+  .footnote-panel-body { overflow: auto; overscroll-behavior: contain; overflow-wrap: anywhere; padding: 0 20px 20px; }
+  .footnote-panel-body :global(p + p) { margin-top: .8em; }
+  .footnote-panel-body :global(a) { color: var(--accent); }
+  .footnote-panel-body :global(img) { max-width: 100%; height: auto; }
+  .footnote-panel-body :global(pre) { overflow-x: auto; font-size: .8em; }
+  .footnote-panel-body :global(code) { font-size: .8em; background: var(--surface); }
+  @keyframes footnote-appear { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .footnote-panel:popover-open { animation: none; } }
+  @media print { .footnote-panel, .footnote-panel:popover-open { display: none !important; } }
+</style>

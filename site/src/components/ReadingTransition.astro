@@ -1,0 +1,60 @@
+<!-- Register before first paint; navigation remains an ordinary document request. -->
+<script is:inline>
+  (() => {
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    let clickedTitle;
+    const visible = (element) => {
+      const rect = element.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < innerHeight && getComputedStyle(element).visibility !== 'hidden';
+    };
+    document.addEventListener('click', (event) => {
+      clickedTitle = undefined;
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target.closest?.('a[data-reading-link]');
+      if (!link || link.target || link.hasAttribute('download')) return;
+      const title = link.closest('.preview-copy')?.querySelector('[data-reading-title]');
+      clickedTitle = title && visible(title) ? title : link.closest('.writing-row')?.querySelector('[data-reading-title]');
+    });
+    function prepare(transition, from, to, outgoing) {
+      if (!transition) return;
+      if (motion.matches || !from || !to || (from.pathname !== '/' && to.pathname !== '/')) {
+        transition.skipTransition();
+        return;
+      }
+      const path = location.pathname === '/' ? (outgoing ? to.pathname : from.pathname) : location.pathname;
+      const candidates = [...document.querySelectorAll('[data-reading-title]')].filter((title) => title.dataset.readingTitle === path && visible(title));
+      const title = outgoing && candidates.includes(clickedTitle) ? clickedTitle : candidates[0];
+      if (!title) { transition.skipTransition(); return; }
+      title.style.viewTransitionName = 'reading-title';
+      document.documentElement.dataset.readingTransition = '';
+      const cleanup = () => {
+        title.style.removeProperty('view-transition-name');
+        delete document.documentElement.dataset.readingTransition;
+        clickedTitle = undefined;
+      };
+      // Names must be cleared in cached documents, before another navigation or theme change.
+      transition.finished.then(cleanup, cleanup);
+    }
+    addEventListener('pageswap', (event) => {
+      const activation = event.activation;
+      prepare(event.viewTransition, activation?.from?.url && new URL(activation.from.url), activation?.entry?.url && new URL(activation.entry.url), true);
+    });
+    addEventListener('pagereveal', (event) => {
+      const activation = window.navigation?.activation;
+      prepare(event.viewTransition, activation?.from?.url && new URL(activation.from.url), new URL(location.href), false);
+    });
+  })();
+</script>
+<style is:global>
+  @view-transition { navigation: auto; }
+  :root[data-reading-transition]::view-transition-group(reading-title) {
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+  }
+  :root[data-reading-transition]::view-transition-old(root),
+  :root[data-reading-transition]::view-transition-new(root) { animation-duration: 180ms; }
+  @media (prefers-reduced-motion: reduce) {
+    @view-transition { navigation: none; }
+    ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  }
+</style>

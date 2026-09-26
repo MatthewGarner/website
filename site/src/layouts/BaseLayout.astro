@@ -4,6 +4,7 @@ import '@fontsource-variable/newsreader/standard.css';
 import '@fontsource-variable/newsreader/standard-italic.css';
 import '../styles/global.css';
 import circleHalf from '@phosphor-icons/core/assets/fill/circle-half-fill.svg?raw';
+import ReadingTransition from '../components/ReadingTransition.astro';
 interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; }
 const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false } = Astro.props;
 const pageTitle = title ? `${title} — Matthew Garner` : 'Matthew Garner';
@@ -15,6 +16,7 @@ const current = Astro.url.pathname;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {(article || current === '/') && <ReadingTransition />}
     <script is:inline>
       (() => {
         let preference = 'system';
@@ -43,7 +45,6 @@ const current = Astro.url.pathname;
         <a class="identity" href="/" aria-current={current === '/' ? 'page' : undefined}>Matthew Garner</a>
         <nav class="primary-nav" aria-label="Main navigation">
           <a href="/writing" aria-current={current === '/writing' || current === '/writing/' ? 'page' : undefined}>Writing</a>
-          <a href="/#projects">Projects</a>
           <a href="/about" aria-current={current === '/about' || current === '/about/' ? 'page' : undefined}>About</a>
         </nav>
         <button class="appearance" type="button" aria-label="Appearance: toggle light and dark mode">
