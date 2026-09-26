@@ -1,56 +1,115 @@
-# Writing and previewing
+# Writing and editing
 
-Keep writing in the existing `content/` folder in Obsidian. The Astro site reads those Markdown files directly. Save a note while the local development preview is running to see the change in your browser.
+[All guides](../README.md) · [Publish your changes](PUBLISHING.md) · [Run a local preview](README.md)
 
-For a new piece, insert the [Writing template](../content/templates/Writing.md) using Obsidian's Templates command, or copy it into a new note. Obsidian fills in the date when inserting the template. Change the title and description, write your piece, then change `draft` to `false` when it is ready to appear in the site build.
+The site reads the Markdown in `content/` directly. Edit it in Obsidian or any text editor; there is no export step or second copy to maintain.
 
-```yaml
+## Start a new piece
+
+1. Create a note such as `content/Small observations.md`.
+2. Insert the [Writing template](../content/templates/Writing.md) using Obsidian’s Templates command, or use the example below.
+3. Set the title, date and description, then write below the properties.
+4. Leave `draft: true` and [run the local site](README.md#run-while-editing). Find the piece under **Local drafts** on `/writing`; its normal page has a **Draft preview** banner.
+5. Follow the [publishing steps](PUBLISHING.md) when ready to put it live.
+
+```markdown
 ---
-title: A small observation
+title: Small observations
 date: 2026-09-26
-description: A sentence that gives someone a reason to read.
+description: A few things I have noticed lately.
 type: note
-draft: false
-featured: true
-featureOrder: 1
+draft: true
 ---
+
+Start with the thought you want to share.
 ```
 
-Only `title` is required. New notes default to published essays unless marked as drafts; the template starts with `draft: true`.
+The block between `---` lines contains the note’s properties, also called frontmatter. Only `title` is required. Use your intended publication date in `YYYY-MM-DD` format. When copying the template file manually, replace `{{date:YYYY-MM-DD}}` yourself; Obsidian fills it in only when inserting the template.
 
-| Property | Effect |
+Use unquoted `true` and `false` for switches and numbers for `featureOrder`. Quote a title or description containing a colon followed by a space: `title: "A thought: on attention"`.
+
+## Edit an existing piece
+
+Open its file in `content/`, change the text or properties and save. Keep its filename and folder unchanged to preserve its address. You can change the displayed `title` freely. Publish the edit through the same Git workflow as a new piece.
+
+Edit `content/index.md` to change **About**, including its heading and biography. Keep that note published and named `index.md`. The homepage introduction and Projects text live separately in the [site code](README.md#change-the-design-or-site-copy).
+
+## Properties
+
+| Property | What it changes |
 | --- | --- |
-| `type` | `essay` is the default; `note` uses a more compact title and reading column. `review` and other short labels work too. |
-| `date` | Displayed on the piece; also orders the Writing archive, newest first. |
-| `description` | Short introduction below the title, homepage preview copy and search/feed description. Omit it for a quieter article header and an automatically generated description. |
-| `featured` | Set to `true` to select a piece for the homepage. |
-| `featureOrder` | A positive number: smaller numbers appear first. Ties use the newest date. |
-| `excerpt` | Optional longer homepage preview text; otherwise taken from the opening paragraphs. |
-| `draft: true` or `publish: false` | Excludes the note from the generated site. |
-| `unlisted: true` | Builds a public page but leaves it out of the homepage, archive, feed and sitemap. This is not a private page. |
+| `title` | The displayed title. Required. |
+| `date` | The displayed date and ordering in Writing, newest first. A future date does **not** delay publication. Undated pieces sort after dated ones. |
+| `description` | The introduction below the article title, plus archive, preview and feed copy. If omitted, the article has no introduction and listing text is drawn from its body. |
+| `type` | `essay` is the default. `note` has a more compact reading layout. `review` and other short labels use the essay layout. |
+| `draft: true` | Excludes the piece from builds and deployments. It remains available as a labelled local draft. Set to `false` when it should be published. |
+| `publish: false` | Also excludes the piece from builds, while allowing a labelled local draft. Remove it or set it to `true` to publish; `draft: true` still takes precedence. |
+| `unlisted: true` | Creates a public page but leaves it out of the homepage, Writing, RSS and sitemap. |
+| `featured: true` | Prioritises the piece for the homepage. |
+| `featureOrder` | Orders featured pieces: `1` first, then `2`, then `3`. Ties use the date. |
+| `excerpt` | Optional longer text for the homepage preview; otherwise taken from the opening text. |
+| `slug` | Fixes the URL independently of the filename. Example: `slug: small-observations`. |
+| `aliases` | A list of old URL paths that should redirect to this piece. |
 
-The homepage shows up to three pieces, filling spare places with recent writing. `index.md` supplies About. The `private/`, `templates/` and hidden folders are excluded.
+New pieces are published by default if neither exclusion flag is set. The supplied template starts with `draft: true`.
 
-Filenames determine URLs unless you set `slug`. Keep an established filename or slug stable; add an old path to the `aliases` list if a URL needs to change. Restart the local preview after changing aliases, since redirects are configured at startup.
+## Choose the homepage writing
 
-## Formatting
+The homepage shows up to three pieces. Add these properties to each chosen piece, using a different order number:
 
-Use ordinary Markdown for headings, lists, quotations, tables, fenced code and footnotes. Obsidian note links (`[[Drifting]]`), labelled links, heading links, image embeds and basic callouts also work.
+```yaml
+featured: true
+featureOrder: 1
+```
 
-- `==A meaningful phrase==` highlights the text in both appearances. Highlights can include emphasis and links.
-- `%% A private editing comment %%` is removed before the page, preview or feed is generated. Comments can span paragraphs; an unfinished comment stops the build. Markers inside code examples remain literal.
-- `![Alternative text](images/photo.jpg "A visible caption.")` gives an image a caption. Use alternative text to describe the image and the caption to explain its context.
-- `![[images/photo.jpg|400]]` embeds an Obsidian image with a chosen width.
-- Footnotes use `A thought.[^aside]` and a later `[^aside]: More detail.` Readers can jump back to the sentence.
+If fewer than three pieces are featured, recent writing fills the remaining spaces. `featured: false` therefore does not guarantee that a piece stays off the homepage. Drafts and unlisted pieces are never selected.
 
-Place public attachments in `content/images/`. Attachments outside excluded folders are copied to the public site, even if only used by a draft. Missing or ambiguous note links stop the build. Note transclusions and block references are not supported.
+## Links, images and formatting
 
-## Local preview
+Use ordinary Markdown for headings, lists, quotations, tables, code and footnotes. These Obsidian features also work:
 
-From the `site/` directory, run `npm run dev`, then open the address it prints. Leave it running while you write. If a save causes an error, correct the note; the preview may retain the last valid version until the error is fixed.
+```markdown
+[[Drifting]]
+[[The gardening metaphor|A related essay]]
+==A phrase worth highlighting==
 
-Before publishing, run `npm run build`, then `npm test` and `npm run check`. These commands check the generated pages, Markdown behaviour and site code. Run the build and check sequentially.
+> [!note] A thought
+> A short aside.
 
-Saving or changing `draft` updates the local preview. Commit and push the content changes to the `v5` branch using your existing Git publishing workflow; Vercel then builds and publishes the site. A failed build leaves the last successful version live. Other branches produce protected previews.
+A sentence with a footnote.[^aside]
 
-This GitHub repository is public: `draft` and `publish` control the generated website, not access to files committed to Git. Keep private writing and attachments outside the repository.
+[^aside]: A little more detail.
+```
+
+Note links can include headings. Local drafts can link to each other. In published builds, missing, unpublished or ambiguous note links stop the build; give a link the exact note path when two notes share a name. Whole-note embeds such as `![[Drifting]]`, block references and collapsible Obsidian callouts are not supported; basic callouts render as visible asides.
+
+Put public images in `content/images/` and refer to them from a note:
+
+```markdown
+![A path through the trees](images/woodland.jpg "An early morning walk.")
+![[images/woodland.jpg|400]]
+```
+
+The first form supplies descriptive alternative text and a visible caption. The second requests an image width. Markdown images and tables adapt to the reading layout; wide tables scroll horizontally.
+
+Text inside `%% editing comments %%` is removed from the generated pages, previews and feed. Close both markers: an unfinished comment stops the build. Markers inside code examples remain literal.
+
+## Keep published addresses stable
+
+`Small observations.md` normally becomes `/small-observations`. Changing its title property leaves that address alone; renaming or moving the file can change it. Before moving a published file, set `slug` to its existing URL path without the leading slash.
+
+If an address must change, preserve the old one as a redirect:
+
+```yaml
+slug: new-address
+aliases:
+  - old-address
+```
+
+Use paths, not full web addresses. Restart the local server after changing filenames, slugs or aliases. Changing a published URL also changes its RSS identity, so retaining the existing slug is preferable. The five original articles have additional migration checks protecting their feed identities.
+
+## What stays off the site
+
+`private/`, `templates/` and folders beginning with a dot are excluded. Draft flags apply to notes; attachments outside excluded folders are still copied, even if used only by a draft.
+
+This GitHub repository is public. Drafts, unlisted pages and editing comments are not a way to keep committed writing confidential. Keep private material outside the repository.

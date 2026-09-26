@@ -1,51 +1,80 @@
-# Publishing and rollback
+# Hosting and recovery
 
-Production: [www.matthewgarner.me](https://www.matthewgarner.me), with [matthewgarner.me](https://matthewgarner.me) permanently redirecting to `www` while preserving the path and query string.
+[All guides](../README.md) · [Everyday publishing](PUBLISHING.md) · [Running locally](README.md)
 
-The existing Vercel project is `matthew-garners-projects/my-web-quartz` (`prj_8vVA6l6X8f3iSH5QqGmLr7oe9fuj`). Its Git connection publishes `MatthewGarner/website`, production branch `v5`. No DNS change is needed.
+The site is hosted on Vercel at [www.matthewgarner.me](https://www.matthewgarner.me). The apex domain, `matthewgarner.me`, redirects permanently to `www`, preserving the path and query string. Ordinary writing changes need no manual deployment or domain changes.
 
-## Git publishing
+## Deployment configuration
 
-Keep the project root at the repository root so Astro can read the sibling `content/` directory. Root `vercel.json` overrides the old dashboard commands: install with `npm ci --prefix site`, then `npm --prefix site run build:release`. Use Node 24. The release command checks types, builds, runs publishing tests and writes `.vercel/output/` at the repository root. Astro declares its own Node types: relying on Quartz’s parent `node_modules` passed locally but failed in a clean Vercel build.
+| Setting | Value |
+| --- | --- |
+| GitHub repository | `MatthewGarner/website` |
+| Production branch | `v5` |
+| Vercel project | [matthew-garners-projects/my-web-quartz](https://vercel.com/matthew-garners-projects/my-web-quartz) |
+| Project ID | `prj_8vVA6l6X8f3iSH5QqGmLr7oe9fuj` |
+| Project root | Repository root |
+| Node version | 24 |
+| Install command | `npm ci` |
+| Build command | `npm run build:release` |
 
-Vercel consumes the [Build Output API](https://vercel.com/docs/build-output-api). Only rendered public files enter its static directory; routing supplies permanent article redirects and real 404 responses. The GitHub “Astro publishing” workflow runs the same build. The Vercel build itself runs all checks, so it cannot publish a failed build even if GitHub checks finish later.
+Root [vercel.json](../vercel.json) supplies the build commands, using the root Astro wrapper commands. Keep the project root at the repository root: Astro needs access to the sibling `content/` folder.
 
-This repository retains an upstream Quartz remote. Use `gh --repo MatthewGarner/website` for repository operations; GitHub CLI can otherwise select the upstream repository.
+The release command checks the code, builds, runs publishing tests and writes `.vercel/output/` at the repository root. Vercel reads this [Build Output API](https://vercel.com/docs/build-output-api) package; its static directory contains only rendered public files. Generated routing supplies permanent article redirects and genuine 404 responses. The [Astro publishing workflow](../.github/workflows/astro.yaml) runs the same checks on GitHub. Failed checks within the Vercel build prevent deployment.
 
-Push a branch to get a protected Vercel preview. Verify it before merging into `v5`:
+Quartz source, dependencies and inactive upstream workflows have been removed from the current branch. The named Git tag `quartz-rollback-2026-09-26` preserves the last Quartz production source. `npm ci` installs the app through the root package’s postinstall command; maintain app dependencies in `site/package.json` and its lockfile. Astro declares its own Node types: relying on the parent Quartz installation previously passed locally but failed in a clean remote build.
 
-```sh
-cd site
-npm run check:hosted -- https://THE-RETURNED-PREVIEW.vercel.app
-```
+This repository retains an upstream Quartz remote. For GitHub CLI operations, specify `--repo MatthewGarner/website`; otherwise the CLI can select the upstream repository.
 
-After production is ready, check both public domains without authentication:
+## Deployment checks
+
+Run from the repository root. After a production deployment, check both public domains:
 
 ```sh
 npm run check:hosted -- https://www.matthewgarner.me --production
 npm run check:hosted -- https://matthewgarner.me --production
 ```
 
-Preview checks use the authenticated Vercel CLI and require `noindex`. Production checks use ordinary public requests and reject `noindex`. The apex domain’s existing 308 redirect is validated before checking the destination; expecting a direct 200 at the apex would incorrectly fail a healthy deployment. Both check articles, aliases, feed identities, public assets and missing/source-file responses. Small interaction scripts may be inline in HTML, so an absent script `src` is not itself a failure.
+For a preview, replace the example with its exact Vercel deployment URL:
 
-For an occasional local prebuilt preview, `npm run build:vercel` creates `site/.vercel/output/`. Link `site/` to the existing project first, then deploy with `npx --yes vercel@60.1.3 deploy --prebuilt --target preview --scope matthew-garners-projects --project prj_8vVA6l6X8f3iSH5QqGmLr7oe9fuj --non-interactive --yes`. Local `.vercel/` and `.env*` files are ignored and must stay out of Git.
+```sh
+npm run check:hosted -- https://YOUR-PREVIEW.vercel.app
+```
 
-## Migration review — 26 September 2026
+Preview checks require authenticated Vercel CLI access to this project and retain its sign-in protection. Production checks use public requests without credentials. They check articles, aliases, RSS identities, images, the stylesheet, sitemap and missing/source-file responses. Preview responses must have `noindex`; production must permit indexing.
 
-| Risk | Resolution |
-| --- | --- |
-| A later Markdown push could rebuild Quartz | Build commands live in versioned root configuration and the Git preview validates that path. |
-| Existing RSS posts could appear new | Preserve Quartz’s exact apex-domain, slashless article GUIDs; a captured fixture guards all five. The feed now lists writing only. |
-| Old links could break or missing pages return 200 | Keep all five article URLs and aliases; generated hosting routes supply 308 redirects and 404 responses. |
-| Drafts or source files could leak into the deployed bundle | Package only rendered output. Draft/private/template exclusions are tested. The current asset inventory contains only the existing public profile and icons. |
-| A protected or non-indexable preview could become the live experience | Check both live domains without credentials, including indexing headers, after cutover. |
+The apex domain’s existing 308 redirect is checked before the final page response. Expecting a direct 200 there would incorrectly fail a healthy deployment. Small interaction scripts may be inline in the page: a missing external script URL does not itself mean the script was lost.
 
-Attachments in public content folders are copied even when referenced only by a draft. Keep private attachments outside this public repository. `unlisted` is discoverability, not access control.
-
-The migration merged in [PR #84](https://github.com/MatthewGarner/website/pull/84), commit `f7926fb87882366473dd577a94e7a90e92ebce32`. Its first production deployment, `dpl_8XSTDCeFgqR6yMX23cJ3TTwxFRTp`, became ready on 26 September 2026. The clean GitHub/Vercel builds passed all 10 tests. Public HTTP checks passed on both domains, including preserved RSS identities and apex redirects; the runtime dependency audit found no known vulnerabilities.
+`npm run build:vercel` is an optional local packaging command for prebuilt previews; it writes `site/.vercel/output/` instead. The normal Git workflow uses `build:release`. Local `.vercel/` settings and `.env*` files are ignored and must stay out of Git.
 
 ## Rollback
 
-The pre-migration Quartz release is `dpl_EkPHexonygBAyACyVkLbG2HAMYhx`: [deployment](https://my-web-quartz-kicju3xpk-matthew-garners-projects.vercel.app). Its source is commit `a2341546234c55d7596b12180cc8fe17c5ecdb7c`.
+For a problem with article text, publish a correction using the [normal workflow](PUBLISHING.md#correct-or-remove-something). For a broken deployment:
 
-If the cutover fails, use Vercel’s rollback action for that deployment in the existing project. Revert the Astro migration merge on `v5` as well, preserving any later writing changes, so future pushes use the Quartz build again. Do not reset the branch or overwrite newer articles. The dashboard’s original Quartz commands are deliberately retained; reverting root `vercel.json` restores them. Confirm both domains and the feed after rollback.
+1. Open this project’s deployments in Vercel, find the last known good production deployment and use its rollback action to restore service.
+2. Revert the offending change on `v5`, preserving later writing, so the next Git deployment does not reintroduce it. Use a revert commit rather than resetting the branch or force-pushing.
+3. After deployment, run the public checks above and open the affected page.
+
+### Emergency return to Quartz
+
+The pre-migration release is `dpl_EkPHexonygBAyACyVkLbG2HAMYhx` ([deployment](https://my-web-quartz-kicju3xpk-matthew-garners-projects.vercel.app)); its source commit is `a2341546234c55d7596b12180cc8fe17c5ecdb7c`. This is a fallback for the framework migration, not the usual rollback target for later edits.
+
+The complete old source and configuration are preserved in the annotated tag `quartz-rollback-2026-09-26`. To inspect or rebuild it without disturbing current work:
+
+```sh
+git fetch origin tag quartz-rollback-2026-09-26
+git worktree add --detach ../website-quartz-rollback quartz-rollback-2026-09-26
+```
+
+Use a new directory name if that one already exists. Restoring the old deployment does not restore its Git publishing configuration. A continued return to Quartz requires bringing its tagged source and build configuration back deliberately while preserving later writing. Do not replace the current branch wholesale with the tag. The old Quartz dependency alerts belong to that historical version; assess them before rebuilding it for continued use. Confirm both domains and the feed afterwards.
+
+## Migration record
+
+[PR #84](https://github.com/MatthewGarner/website/pull/84) moved production to Astro on 26 September 2026, merge commit `f7926fb87882366473dd577a94e7a90e92ebce32`. The first production deployment was `dpl_8XSTDCeFgqR6yMX23cJ3TTwxFRTp`.
+
+Existing article paths and aliases were retained. RSS keeps the original apex-domain, slashless article identities so subscribers do not receive old writing again; the fixture in `tests/fixtures/legacy-rss.json` protects those five entries. The feed now lists writing only. Draft and source-file exclusions, clean builds, live routing and both appearances were checked; details are in [the dated verification record](design-qa.md). Public attachment behaviour is documented in [the authoring guide](AUTHORING.md#what-stays-off-the-site).
+
+## Local draft isolation
+
+Local drafts require Astro’s development watcher, a loopback-only server and no CI/Vercel environment. The loader controls the preview marker; a note cannot enable it through frontmatter. Published lists, RSS and the sitemap continue to use published notes only. Builds replace the content store, so cached draft previews cannot survive into output.
+
+The release tests create an isolated copy with draft notes, exercise their pages and saved edits, then build from the warmed cache and check for leaked paths or text. They also check that a hosted development environment excludes drafts. Test notes never enter the real Obsidian folder.

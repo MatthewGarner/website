@@ -44,10 +44,10 @@ export interface NoteSource {
   aliases: string[];
 }
 
-export function noteSources(root = CONTENT_DIR): NoteSource[] {
+export function noteSources(root = CONTENT_DIR, { includeDrafts = false } = {}): NoteSource[] {
   return contentFiles(root).filter((file) => file.endsWith('.md')).flatMap((file) => {
     const { data } = matter.read(file);
-    if (!isPublished(data)) return [];
+    if (!includeDrafts && !isPublished(data)) return [];
     const relative = path.relative(root, file).split(path.sep).join('/');
     return [{ file, relative, slug: noteSlug(relative, data), title: String(data.title ?? path.basename(file, '.md')),
       aliases: (Array.isArray(data.aliases) ? data.aliases : []).map(String) }];
