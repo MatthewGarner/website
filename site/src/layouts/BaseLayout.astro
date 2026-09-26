@@ -43,7 +43,6 @@ const current = Astro.url.pathname;
         <a class="identity" href="/" aria-current={current === '/' ? 'page' : undefined}>Matthew Garner</a>
         <nav class="primary-nav" aria-label="Main navigation">
           <a href="/writing" aria-current={current === '/writing' || current === '/writing/' ? 'page' : undefined}>Writing</a>
-          <a href="/#projects">Projects</a>
           <a href="/about" aria-current={current === '/about' || current === '/about/' ? 'page' : undefined}>About</a>
         </nav>
         <button class="appearance" type="button" aria-label="Appearance: toggle light and dark mode">

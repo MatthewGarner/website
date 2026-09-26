@@ -89,7 +89,7 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 | --- | --- |
 | Article text, titles, dates and homepage selections | Markdown in `content/`; see [the authoring guide](AUTHORING.md). |
 | About heading, biography and portrait reference | `content/index.md` |
-| Homepage headline, introduction, Projects text and links | [src/pages/index.astro](src/pages/index.astro) |
+| Homepage headline, introduction and Tools link | [src/pages/index.astro](src/pages/index.astro) |
 | Site name, navigation, footer links, default description and theme toggle | [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) |
 | Colours, spacing, typography, mobile layouts and transitions | [src/styles/global.css](src/styles/global.css) |
 | Article layout, reading time and “Keep reading” | [src/pages/[...slug].astro](src/pages/%5B...slug%5D.astro) |
