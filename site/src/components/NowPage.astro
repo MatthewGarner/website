@@ -1,0 +1,13 @@
+---
+import { longDate, type Note } from '../lib/content';
+interface Props { note: Note; }
+const { note } = Astro.props;
+---
+<article class="essay now-page">
+  <header class="essay-heading">
+    <h1>{note.data.title}</h1>
+    {note.data.description && <p class="essay-description">{note.data.description}</p>}
+    {note.data.updated && <p class="updated-date">Updated <time datetime={note.data.updated.toISOString()}>{longDate(note.data.updated)}</time></p>}
+  </header>
+  <div class="prose"><slot /></div>
+</article>

@@ -17,7 +17,7 @@ test('homepage curation follows properties, ignores hidden notes, and fills spar
     note('unlisted', { featured: true, unlisted: true }), note('private', { featured: true, publish: false }), note('old')];
   assert.deepEqual(selectFeatured(notes).map(({ id }) => id), ['first', 'second', 'recent']);
   assert.deepEqual(selectFeatured([note('old'), note('recent', { date: new Date('2026-02-01') })]).map(({ id }) => id), ['recent', 'old']);
-  assert.deepEqual(selectFeatured([note('index'), note('draft', { draft: true })]), []);
+  assert.deepEqual(selectFeatured([note('index'), note('now', { featured: true }), note('bookshelf', { featured: true }), note('draft', { draft: true })]), []);
 });
 
 test('comments vanish before link resolution, previews and rendering; code and escaped syntax survive', async () => {

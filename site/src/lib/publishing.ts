@@ -50,8 +50,13 @@ export function noteSources(root = CONTENT_DIR, { includeDrafts = false } = {}):
     const { data } = matter.read(file);
     if (!includeDrafts && !isPublished(data)) return [];
     const relative = path.relative(root, file).split(path.sep).join('/');
-    return [{ file, relative, slug: noteSlug(relative, data), title: String(data.title ?? path.basename(file, '.md')),
-      aliases: (Array.isArray(data.aliases) ? data.aliases : []).map(String) }];
+    const slug = noteSlug(relative, data);
+    const aliases = (Array.isArray(data.aliases) ? data.aliases : []).map(String);
+    // Source pages and redirects must never shadow the generated PNG endpoints.
+    for (const publicPath of [slug, ...aliases.map(safeSlug)]) {
+      if (publicPath === 'social' || publicPath.startsWith('social/')) throw new Error(`Reserved generated image path: ${publicPath}`);
+    }
+    return [{ file, relative, slug, title: String(data.title ?? path.basename(file, '.md')), aliases }];
   });
 }
 

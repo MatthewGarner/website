@@ -114,6 +114,33 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .draft-label { margin-left: 12px; color: var(--muted); font: 13px ui-monospace, monospace; }
 .tools-note { margin-top: 36px; padding: 25px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 21px; }
 .tools-note a { color: var(--accent); }
+.now-preview { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; padding: 30px 0; margin-top: 36px; border-top: 1px solid var(--line); }
+.now-preview h2 { font-size: 27px; }
+.now-preview h2 a { text-decoration: none; }
+.now-preview time { display: block; margin-top: 8px; color: var(--muted); font: 13px ui-monospace, monospace; }
+.now-preview > p { max-width: 610px; font-size: 24px; text-wrap: pretty; }
+.now-preview + .tools-note { margin-top: 0; }
+.personal-eyebrow { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 18px; }
+.now-page { padding-top: 65px; }
+.updated-date { margin-top: 24px; color: var(--muted); font-size: 17px; }
+.bookshelf-page { padding-bottom: 55px; }
+.bookshelf-page .page-heading { padding-bottom: 30px; }
+.shelf-intro { max-width: 730px; }
+.shelf-section { margin-top: 32px; }
+.shelf-section > h2 { padding: 18px 0; border-top: 1px solid var(--line); font-size: 30px; }
+.book-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 38px; list-style: none; padding: 20px 0 0; margin: 0; }
+.book-entry { min-width: 0; padding-bottom: 36px; }
+.book-jacket { width: min(100%, 190px); aspect-ratio: 2 / 3; margin: 0 auto 28px; }
+.book-jacket img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.book-lettering { height: 100%; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; padding: 24px 20px 22px 25px; border-left: 8px solid #0001; background: #e4dbee; color: #362546; box-shadow: 3px 3px 0 var(--line); }
+.book-tone-1 .book-lettering { background: #e6ebd8; color: #34412e; }
+.book-tone-2 .book-lettering { background: #ece3cd; color: #4b3d28; }
+.book-lettering > :first-child { font-family: var(--display); font-size: 26px; line-height: 1.2; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; }
+.book-lettering > :last-child { font-size: 16px; line-height: 1.3; }
+.book-copy h3 { font-size: 29px; line-height: 1.2; overflow-wrap: anywhere; }
+.book-copy h3 a { text-decoration-thickness: 1px; }
+.book-author { margin-top: 7px; color: var(--muted); font-size: 18px; }
+.book-note { margin-top: 15px; font-size: 21px; line-height: 1.4; }
 .site-footer { border-top: 1px solid var(--line); padding: 22px 0 30px; font-size: 23px; }
 .footer-links { display: flex; gap: 34px; }
 .site-footer a { text-decoration: none; }
@@ -210,7 +237,7 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   .site-frame { width: calc(100% - 56px); }
   .site-header { gap: 25px; min-height: 82px; }
   .identity { font-size: 25px; }
-  .primary-nav { gap: 22px; }
+  .primary-nav { gap: 18px; }
   .primary-nav, .appearance { font-size: 19px; }
   .intro { gap: 24px; padding: 38px 0 46px; }
   .intro h1 { font-size: 8.2vw; letter-spacing: -1px; }
@@ -258,6 +285,14 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   .preview-excerpt { font-size: 21px; margin: 17px 0; }
   .preview-copy .text-link { font-size: 21px; }
   .tools-note { margin-top: 12px; padding: 23px 0; font-size: 19px; }
+  .now-preview { grid-template-columns: 1fr; gap: 16px; margin-top: 12px; padding: 24px 0; }
+  .now-preview > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 20px; }
+  .now-preview time { margin-top: 0; }
+  .now-preview > p { font-size: 22px; }
+  .now-page { padding-top: 40px; }
+  .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+  .book-copy h3 { font-size: 25px; }
+  .book-note { font-size: 19px; }
   .site-footer { font-size: 17px; padding-top: 20px; }
   .footer-links { gap: 27px; }
   .page-heading { padding: 38px 0 36px; }
@@ -280,6 +315,17 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   .prose h3 { font-size: 26px; }
   .about { padding-top: 40px; }
 }
+@media (max-width: 480px) {
+  .book-grid { grid-template-columns: 1fr; gap: 30px; }
+  .book-entry { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: start; gap: 22px; padding-bottom: 25px; border-bottom: 1px solid var(--line); }
+  .book-jacket { margin: 0; }
+  .book-lettering { padding: 14px 10px 12px; gap: 12px; border-left-width: 5px; }
+  .book-lettering > :first-child { font-size: 16px; -webkit-line-clamp: 4; }
+  .book-lettering > :last-child { font-size: 11px; }
+  .book-copy h3 { font-size: 23px; }
+  .book-author { font-size: 16px; }
+  .book-note { font-size: 18px; margin-top: 10px; }
+}
 @media print {
   @page { margin: 18mm 16mm; background: white; }
   /* Override the inline screen theme too; otherwise Chromium prints dark page margins. */
@@ -298,6 +344,7 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   .prose table { min-width: 0; }
   .prose img { max-height: 95mm; object-fit: contain; }
   .prose [data-footnote-backref] { display: none; }
+  .book-entry { break-inside: avoid; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }

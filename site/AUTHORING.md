@@ -36,6 +36,32 @@ Open its file in `content/`, change the text or properties and save. Keep its fi
 
 Edit `content/index.md` to change **About**, including its heading and biography. Keep that note published and named `index.md`. The homepage introduction and Projects text live separately in the [site code](README.md#change-the-design-or-site-copy).
 
+## Now and Bookshelf
+
+Edit `content/Now.md` and `content/Bookshelf.md` in Obsidian. Both start as drafts: preview them through **Local drafts** on `/writing`, then set `draft: false` when ready. Published pages appear in the navigation, but never in Writing or the RSS feed. `unlisted: true` also hides their navigation links and homepage mentions while keeping the pages available by their direct addresses. Keep their `slug` values unchanged.
+
+For **Now**, write a few short sections in the body. Set `updated: 2026-09-27` to the date of your actual update. An optional `excerpt` supplies the short **Lately** section on the homepage; otherwise it uses your opening paragraph. The date changes only when you edit it.
+
+For **Bookshelf**, add entries to the `books` property. Use `reading` for current books and `favourite` for keepers. Order within each section follows the file. The body below the properties is an optional introduction.
+
+```yaml
+books:
+  - title: Book title
+    author: Author name
+    status: favourite
+    note: A sentence about why it stayed with me.
+    cover: images/books/book-cover.jpg
+    url: https://example.com/book
+```
+
+Only `title` and `author` are required for each book; omitted status means `favourite`. The `note` is plain text. Store optional cover images in `content/images/books/` and use their vault path as shown. Without a cover, the site creates a simple typographic jacket from the title and author. The optional `url` makes the title a link. Remove example paths and links rather than leaving them as placeholders.
+
+## Sharing images
+
+Published writing gets a matching social image automatically during the normal build. Its title appears with the site's typography and colours, so sharing a link needs no separate image upload. Editing a title regenerates its image on the next build; social services may take time to refresh a previously cached preview. Drafts use the site's default image and never generate public cards.
+
+The `/social/` URL space is reserved for these generated images; do not use it for note slugs or aliases.
+
 ## Properties
 
 | Property | What it changes |

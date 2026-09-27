@@ -89,6 +89,8 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 | --- | --- |
 | Article text, titles, dates and homepage selections | Markdown in `content/`; see [the authoring guide](AUTHORING.md). |
 | About heading, biography and portrait reference | `content/index.md` |
+| Now update and Bookshelf entries | `content/Now.md` and `content/Bookshelf.md`; see [Personal pages](AUTHORING.md#now-and-bookshelf). |
+| Now and Bookshelf layouts | `src/components/NowPage.astro` and `src/components/BookshelfPage.astro` |
 | Homepage introduction and Tools link | [src/pages/index.astro](src/pages/index.astro) |
 | Homepage headline and its pointer/touch response | [src/components/ResponsiveHeadline.astro](src/components/ResponsiveHeadline.astro) |
 | Homepage entrance and opening paper fan | [src/components/HomeArrival.astro](src/components/HomeArrival.astro) |
@@ -100,7 +102,7 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 | Writing archive layout | [src/pages/writing.astro](src/pages/writing.astro) |
 | Homepage article preview content | [src/components/Preview.astro](src/components/Preview.astro) |
 | About page layout and its search description | [src/pages/about.astro](src/pages/about.astro) |
-| Browser icon and shared social image | `content/static/icon.ico` and `content/static/og-image.png` |
+| Browser icon and default social image | `content/static/icon.ico` and `content/static/og-image.png`; writing cards are generated during the build. |
 
 The colour variables at the top of `global.css` define light mode; `:root[data-theme='dark']` defines dark mode. Fonts are imported in `BaseLayout.astro` and selected through `--display` and `--serif` in the stylesheet. Both fonts are served locally.
 

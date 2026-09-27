@@ -7,12 +7,17 @@ import circleHalf from '@phosphor-icons/core/assets/fill/circle-half-fill.svg?ra
 import ReadingTransition from '../components/ReadingTransition.astro';
 import Colophon from '../components/Colophon.astro';
 import HomeArrival from '../components/HomeArrival.astro';
-interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; }
-const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false } = Astro.props;
+import { listedPersonalPages } from '../lib/content';
+import { personalPages } from '../lib/personal-pages';
+interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; socialImage?: string; }
+const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false, socialImage } = Astro.props;
 const pageTitle = title ? `${title} — Matthew Garner` : 'Matthew Garner';
+const imageUrl = new URL(socialImage || '/static/og-image.png', Astro.site);
+const imageAlt = socialImage ? pageTitle : 'Matthew Garner — writing and small tools';
 // Directory builds add a slash; public routes redirect to the slashless URL.
 const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '') || '/', Astro.site);
 const current = Astro.url.pathname;
+const availablePages = new Set((await listedPersonalPages()).map((note) => note.id));
 ---
 <!doctype html>
 <html lang="en-GB">
@@ -40,7 +45,14 @@ const current = Astro.url.pathname;
     <meta property="og:description" content={description} />
     <meta property="og:type" content={article ? 'article' : 'website'} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL('/static/og-image.png', Astro.site)} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content={imageAlt} />
+    {socialImage && <><meta property="og:image:type" content="image/png" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /></>}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:image:alt" content={imageAlt} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -49,6 +61,7 @@ const current = Astro.url.pathname;
         <a class="identity" href="/" aria-current={current === '/' ? 'page' : undefined}>Matthew Garner</a>
         <nav class="primary-nav" aria-label="Main navigation">
           <a href="/writing" aria-current={current === '/writing' || current === '/writing/' ? 'page' : undefined}>Writing</a>
+          {personalPages.filter((page) => availablePages.has(page.id)).map((page) => <a href={`/${page.id}`} aria-current={current.replace(/\/$/, '') === `/${page.id}` ? 'page' : undefined}>{page.title}</a>)}
           <a href="/about" aria-current={current === '/about' || current === '/about/' ? 'page' : undefined}>About</a>
         </nav>
         <button class="appearance" type="button" aria-label="Appearance: toggle light and dark mode">

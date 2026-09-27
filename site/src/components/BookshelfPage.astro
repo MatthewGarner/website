@@ -1,0 +1,33 @@
+---
+import { type Note } from '../lib/content';
+interface Props { note: Note; }
+const { note } = Astro.props;
+const groups = [
+  { status: 'reading', title: 'Currently reading' },
+  { status: 'favourite', title: 'Favourites' },
+].map((group) => ({ ...group, books: note.data.books.filter((book) => book.status === group.status) }));
+---
+<article class="bookshelf-page">
+  <header class="page-heading">
+    <p class="eyebrow personal-eyebrow">The books that stay</p>
+    <h1>{note.data.title}</h1>
+    {note.data.description && <p>{note.data.description}</p>}
+  </header>
+  <div class="prose shelf-intro"><slot /></div>
+  {groups.filter((group) => group.books.length).map((group) => <section class="shelf-section" aria-labelledby={`shelf-${group.status}`}>
+    <h2 id={`shelf-${group.status}`}>{group.title}</h2>
+    <ul class="book-grid">
+      {group.books.map((book, index) => <li class="book-entry">
+        <div class:list={['book-jacket', `book-tone-${index % 3}`]}>
+          {book.cover ? <img src={book.cover} alt="" width="240" height="360" loading="lazy" /> :
+            <div class="book-lettering" aria-hidden="true"><span>{book.title}</span><span>{book.author}</span></div>}
+        </div>
+        <div class="book-copy">
+          <h3>{book.url ? <a href={book.url}>{book.title}<span class="sr-only"> — more about this book</span></a> : book.title}</h3>
+          <p class="book-author">{book.author}</p>
+          {book.note && <p class="book-note">{book.note}</p>}
+        </div>
+      </li>)}
+    </ul>
+  </section>)}
+</article>
