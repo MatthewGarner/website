@@ -19,6 +19,9 @@ let sample = fs.readFileSync(path.join(source, 'tests/fixtures/reading-sample.md
 sample += '\n\nA repeated reference checks keyboard return.[^pace]\n';
 sample = sample.replace('This footnote is deliberately brief.', 'This footnote is deliberately brief. See [Drifting](/drifting).');
 fs.writeFileSync(path.join(directory, 'content/interaction-sample.md'), sample);
+// Personal-page examples belong only in this disposable build, never the author's vault.
+fs.writeFileSync(path.join(directory, 'content/Now.md'), '---\ntitle: Now\nslug: now\nupdated: 2026-09-27\nexcerpt: Making a little room for reading and small projects.\n---\n## Work & making\n\nA current project, with [a link to an essay](/drifting).\n\n## Away from the screen\n\nA few walks and a good book.');
+fs.writeFileSync(path.join(directory, 'content/Bookshelf.md'), '---\ntitle: Bookshelf\nslug: bookshelf\ndescription: Favourites and books on the go.\nbooks:\n  - title: The Current Read\n    author: Example Author\n    status: reading\n    note: A short note about the book currently on the go.\n  - title: A Favourite Book\n    author: Another Author\n    note: A few words about what makes this one worth keeping.\n    cover: images/profile.jpg\n    url: https://example.com/book\n  - title: A Longer Book Title About Journeys and Unexpected Discoveries\n    author: A. N. Author\n    note: A longer title should sit comfortably on the shelf.\n---\nA small selection, kept for the pleasure of returning to it.');
 const require = createRequire(import.meta.url);
 const astro = path.resolve(path.dirname(require.resolve('astro/package.json')), require('astro/package.json').bin.astro);
 execFileSync(process.execPath, [astro, 'build'], { cwd: project, env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1' }, stdio: 'inherit' });

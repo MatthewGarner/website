@@ -65,6 +65,8 @@ test('drafts render locally, refresh on save, and cannot survive into builds or 
     const body = '---\ntitle: Unpublished sentinel\ndraft: true\nfeatured: true\naliases: [unpublished-alias]\n---\nDraft body sentinel. See [[Withheld sentinel]].';
     fs.writeFileSync(draft, body);
     fs.writeFileSync(path.join(directory, 'content/Withheld sentinel.md'), '---\ntitle: Withheld sentinel\npublish: false\nlocalDraft: true\n---\nWithheld body sentinel.');
+    fs.writeFileSync(path.join(directory, 'content/Now.md'), '---\ntitle: Now\nslug: now\ndraft: true\nexcerpt: Unpublished now sentinel\n---\nUnpublished now sentinel.');
+    fs.writeFileSync(path.join(directory, 'content/Bookshelf.md'), '---\ntitle: Bookshelf\nslug: bookshelf\ndraft: true\nbooks:\n  - title: Unpublished book sentinel\n    author: Test author\n---\nUnpublished bookshelf sentinel.');
     fs.mkdirSync(path.join(directory, 'content/private'), { recursive: true });
     fs.writeFileSync(path.join(directory, 'content/private/Hidden sentinel.md'), '---\ntitle: Hidden sentinel\n---\nExcluded folder sentinel.');
     const url = await start();
@@ -83,6 +85,15 @@ test('drafts render locally, refresh on save, and cannot survive into builds or 
     assert.match(page.body, /noindex, nofollow/);
     assert.match(page.body, /href="\/withheld-sentinel"/);
     assert.equal((await get('/withheld-sentinel')).status, 200);
+    const now = await get('/now');
+    assert.equal(now.status, 200, logs);
+    assert.match(now.body, /Unpublished now sentinel/);
+    assert.match(now.body, /Draft preview/);
+    const shelf = await get('/bookshelf');
+    assert.equal(shelf.status, 200, logs);
+    assert.match(shelf.body, /Unpublished book sentinel/);
+    assert.match(shelf.body, /noindex, nofollow/);
+    assert.doesNotMatch((await get('/')).body, /href="\/(?:now|bookshelf)"/);
     assert.equal((await get('/private/hidden-sentinel')).status, 404);
     for (const route of ['/', '/index.xml', '/sitemap.xml']) {
       assert.doesNotMatch((await get(route)).body, /[Uu]npublished|[Ww]ithheld|local-draft-sentinel/);
@@ -99,6 +110,8 @@ test('drafts render locally, refresh on save, and cannot survive into builds or 
     // Reuse the warmed dev cache: it must not carry unpublished entries into a build.
     await run(process.execPath, [astro, 'build'], { cwd: project, env: { ...localEnv, NODE_ENV: 'development' }, maxBuffer: 4 * 1024 * 1024 });
     const dist = path.join(project, 'dist');
+    assert.ok(!fs.existsSync(path.join(dist, 'now')));
+    assert.ok(!fs.existsSync(path.join(dist, 'bookshelf')));
     for (const file of fs.readdirSync(dist, { recursive: true }).map(String)) {
       assert.doesNotMatch(file, /local-draft-sentinel|withheld-sentinel|unpublished-alias|hidden-sentinel/);
       if (/\.(?:html|xml)$/.test(file)) {

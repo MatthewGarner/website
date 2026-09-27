@@ -8,6 +8,7 @@ import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import matter from 'gray-matter';
 import { obsidianMarkdown } from '../src/lib/obsidian';
 import { CONTENT_DIR, noteSources, resolveNote, noteHref } from '../src/lib/publishing';
+import { isPersonalPage } from '../src/lib/personal-pages';
 
 test('existing RSS article identities survive the Quartz migration', () => {
   const legacy: string[] = JSON.parse(fs.readFileSync('tests/fixtures/legacy-rss.json', 'utf8'));
@@ -17,13 +18,15 @@ test('existing RSS article identities survive the Quartz migration', () => {
   assert.equal(new Set(guids).size, guids.length);
 });
 
-test('every existing essay and old alias has a built public page', () => {
+test('every published note and old alias has a built public page', () => {
   const notes = noteSources().filter((note) => note.slug !== 'index');
   assert.ok(notes.length >= 5);
   assert.ok(notes.some((note) => note.relative === 'Pet peeves #1.md' && note.slug === 'pet-peeves-1'));
   for (const note of notes) {
     const html = fs.readFileSync(path.join('dist', note.slug, 'index.html'), 'utf8');
-    assert.match(html, /class="prose"/);
+    // Personal pages share the publishing pipeline but use their own layouts.
+    if (isPersonalPage(note.slug)) assert.match(html, /<meta property="og:type" content="website"/);
+    else assert.match(html, /class="prose"/);
     assert.ok(html.includes(`<link rel="canonical" href="https://www.matthewgarner.me${noteHref(note.slug)}`));
     for (const alias of note.aliases) {
       const redirect = fs.readFileSync(path.join('dist', alias, 'index.html'), 'utf8');
@@ -35,7 +38,7 @@ test('every existing essay and old alias has a built public page', () => {
   assert.ok(!about.includes('![[images/'));
   assert.ok(fs.existsSync('dist/images/profile.jpg'));
   const listed = notes.filter((note) => !matter.read(note.file).data.unlisted);
-  assert.equal((fs.readFileSync('dist/index.xml', 'utf8').match(/<item>/g) ?? []).length, listed.length);
+  assert.equal((fs.readFileSync('dist/index.xml', 'utf8').match(/<item>/g) ?? []).length, listed.filter((note) => !isPersonalPage(note.slug)).length);
   assert.equal((fs.readFileSync('dist/sitemap.xml', 'utf8').match(/<url>/g) ?? []).length, listed.length + 3);
 });
 
@@ -64,5 +67,16 @@ test('drafts, private folders and ambiguous wikilinks cannot silently become pub
     fs.writeFileSync(path.join(root, 'other', 'Copy.md'), '---\ntitle: Visible\n---\nOther.');
     notes = noteSources(root);
     assert.throws(() => resolveNote('Visible', 'unrelated/start.md', notes), /Ambiguous/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+test('notes and aliases cannot shadow generated social images', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'site-social-paths-'));
+  try {
+    const file = path.join(root, 'Example.md');
+    for (const properties of ['slug: social', 'slug: social/example.png', 'aliases: [social/example.png]']) {
+      fs.writeFileSync(file, `---\ntitle: Example\n${properties}\n---\nAn essay.`);
+      assert.throws(() => noteSources(root), /Reserved generated image path/);
+    }
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

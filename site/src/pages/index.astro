@@ -2,8 +2,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Preview from '../components/Preview.astro';
 import ResponsiveHeadline from '../components/ResponsiveHeadline.astro';
-import { selectedWriting, shortDate, noteHref, writingType } from '../lib/content';
+import { selectedWriting, listedPersonalPages, excerpt, shortDate, noteHref, writingType } from '../lib/content';
 const notes = await selectedWriting();
+const personalPages = await listedPersonalPages();
+const now = personalPages.find((note) => note.id === 'now');
 ---
 <BaseLayout>
   <section class="intro" aria-labelledby="intro-title">
@@ -35,6 +37,10 @@ const notes = await selectedWriting();
       <span class="sr-only" aria-live="polite" id="preview-announcement"></span>
     </aside>
   </section>
+  {now && <aside class="now-preview" aria-labelledby="now-title">
+    <div><h2 id="now-title"><a href="/now">Lately <span aria-hidden="true">→</span></a></h2>{now.data.updated && <time datetime={now.data.updated.toISOString()}>{shortDate(now.data.updated)}</time>}</div>
+    <p>{excerpt(now)}</p>
+  </aside>}
   <aside class="tools-note" id="projects" aria-label="Small tools">
     <p>I also make <a href="https://tools.matthewgarner.me">small tools for thinking clearly <span aria-hidden="true">↗</span></a>.</p>
   </aside>

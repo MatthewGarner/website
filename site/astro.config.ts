@@ -8,6 +8,7 @@ import { obsidianMarkdown } from './src/lib/obsidian';
 import { readingProse } from './src/lib/prose';
 import { CONTENT_DIR, contentFiles, assetExtensions, noteSources, safeSlug, noteHref } from './src/lib/publishing';
 import { localDraftsEnabled } from './src/lib/drafts';
+import { isPersonalPage } from './src/lib/personal-pages';
 
 const markdownProcessor = (includeDrafts = false) => unified({
   remarkPlugins: [[obsidianMarkdown, { includeDrafts }]], rehypePlugins: [rehypeSlug, readingProse],
@@ -45,11 +46,11 @@ const contentAssets: AstroIntegration = {
 };
 
 const redirects: Record<string, string> = {};
-const reserved = new Set(['index', 'writing', 'about', '404', 'index.xml', 'sitemap.xml']);
+const reserved = new Set(['index', 'writing', 'about', 'now', 'bookshelf', '404', 'index.xml', 'sitemap.xml']);
 const notes = noteSources();
 const slugs = new Set<string>();
 for (const note of notes) {
-  if ((note.slug !== 'index' && reserved.has(note.slug)) || slugs.has(note.slug)) throw new Error(`Duplicate or reserved note path: ${note.slug}`);
+  if ((note.slug !== 'index' && !isPersonalPage(note.slug) && reserved.has(note.slug)) || slugs.has(note.slug)) throw new Error(`Duplicate or reserved note path: ${note.slug}`);
   slugs.add(note.slug);
 }
 for (const note of notes) {

@@ -6,6 +6,10 @@ import arrowLeft from '@phosphor-icons/core/assets/regular/arrow-left.svg?raw';
 import Footnotes from '../components/Footnotes.astro';
 import QuotePassage from '../components/QuotePassage.astro';
 import ReadingDetails from '../components/ReadingDetails.astro';
+import NowPage from '../components/NowPage.astro';
+import BookshelfPage from '../components/BookshelfPage.astro';
+import { isPersonalPage } from '../lib/personal-pages';
+import { socialImageHref } from '../lib/social-card-url';
 export async function getStaticPaths() {
   return (await readableNotes()).map((note) => ({ params: { slug: note.id }, props: { note } }));
 }
@@ -14,8 +18,10 @@ const { Content } = await render(note);
 const others = await writing();
 const current = others.findIndex((entry) => entry.id === note.id);
 const next = others[(current + 1) % others.length];
+const personalPage = isPersonalPage(note.id);
 ---
-<BaseLayout title={note.data.title} description={description(note)} article localDraft={isLocalDraft(note)}>
+<BaseLayout title={note.data.title} description={description(note)} article={!personalPage} localDraft={isLocalDraft(note)} socialImage={!personalPage && !isLocalDraft(note) ? socialImageHref(note.id) : undefined}>
+  {note.id === 'now' ? <NowPage note={note}><Content /></NowPage> : note.id === 'bookshelf' ? <BookshelfPage note={note}><Content /></BookshelfPage> : <>
   <article class:list={['essay', { 'essay-note': writingType(note) === 'note' }]}>
     <a class="back-link" href="/writing"><span class="icon" aria-hidden="true" set:html={arrowLeft} />All writing</a>
     <header class="essay-heading">
@@ -30,4 +36,5 @@ const next = others[(current + 1) % others.length];
       {next && next.id !== note.id && <nav class="next-essay" aria-label="More writing"><span class="eyebrow">Keep reading</span><a href={noteHref(next.id)}>{next.data.title}</a></nav>}
     </ReadingDetails>
   </article>
+  </>}
 </BaseLayout>

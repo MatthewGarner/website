@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { isPublished, plainText, noteHref } from './publishing';
 import { newestFirst, selectFeatured } from './editorial';
+import { isPersonalPage } from './personal-pages';
 
 export type Note = CollectionEntry<'notes'>;
 export const isLocalDraft = (note: Note) => import.meta.env.DEV && note.data.localDraft;
@@ -8,12 +9,13 @@ export const publishedNotes = () => getCollection('notes', (note) => note.id !==
 export const localDrafts = async () => (await getCollection('notes', (note) => note.id !== 'index' && isLocalDraft(note))).sort(newestFirst);
 export const readableNotes = async () => [...await publishedNotes(), ...await localDrafts()];
 export async function writing() {
-  return (await publishedNotes()).filter((note) => !note.data.unlisted)
+  return (await publishedNotes()).filter((note) => !isPersonalPage(note.id) && !note.data.unlisted)
     .sort(newestFirst);
 }
 export async function selectedWriting() {
   return selectFeatured(await writing());
 }
+export const listedPersonalPages = async () => (await publishedNotes()).filter((note) => isPersonalPage(note.id) && !note.data.unlisted);
 function shorten(text: string, limit: number) {
   if (text.length <= limit) return text;
   return text.slice(0, limit).replace(/\s+\S*$/, '').replace(/[.,;:]$/, '') + '…';
