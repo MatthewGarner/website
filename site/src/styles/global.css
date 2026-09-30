@@ -39,7 +39,7 @@ button { cursor: pointer; }
 h1, h2, h3, p { margin: 0; }
 h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(--display); font-weight: 600; }
 .site-frame { width: min(1120px, calc(100% - 80px)); margin-inline: auto; }
-.site-header { display: flex; align-items: center; gap: 36px; min-height: 100px; border-bottom: 1px solid var(--line); }
+.site-header { display: flex; align-items: center; gap: 36px; min-height: clamp(76px, 10svh, 100px); border-bottom: 1px solid var(--line); }
 .identity { font-size: 36px; line-height: 1.1; text-decoration: none; white-space: nowrap; margin-right: auto; }
 .primary-nav { display: flex; align-items: center; gap: 34px; font-size: 23px; }
 .primary-nav a { text-decoration: none; }
@@ -64,29 +64,32 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 :root[data-theme-reveal]::view-transition-old(root) { z-index: 1; }
 :root[data-theme-reveal]::view-transition-new(root) { z-index: 2; }
 :root[data-theme-reveal]::view-transition-group(root) { animation-duration: 620ms; }
-.intro { display: grid; grid-template-columns: 55.5% 1fr; gap: 30px; padding: 45px 0 57px; align-items: start; }
-.intro h1 { font-size: clamp(64px, 8.15vw, 98px); line-height: 1.16; letter-spacing: -2.5px; font-weight: 700; }
-.intro-copy { padding-top: 34px; max-width: 440px; }
-.intro-copy p { font-size: 37px; line-height: 1.3; text-wrap: pretty; }
-.intro-copy > a { display: inline-block; margin-top: 24px; font-size: 20px; color: var(--muted); }
+/* Initial desktop view: introduction, three selected titles and the full reading
+   preview. Secondary sections continue below. Use the usable viewport height as
+   well as width, with readable minimums and natural scrolling at higher zoom. */
+.intro { display: grid; grid-template-columns: 55.5% 1fr; gap: 30px; padding: clamp(22px, 3.5svh, 45px) 0 clamp(24px, 3.7svh, 57px); align-items: start; }
+.intro h1 { font-size: clamp(52px, min(8.15vw, 8svh), 98px); line-height: 1.16; letter-spacing: -1.5px; font-weight: 700; }
+.intro-copy { padding-top: clamp(16px, 2.5svh, 34px); max-width: 440px; }
+.intro-copy p { font-size: clamp(26px, min(3.1vw, 3.5svh), 37px); line-height: 1.3; text-wrap: pretty; }
+.intro-copy > a { display: inline-block; margin-top: clamp(16px, 2.3svh, 24px); font-size: 20px; color: var(--muted); }
 .intro-copy > a:hover { color: var(--accent); }
 .writing-preview { display: grid; grid-template-columns: 55.5% 1fr; gap: 30px; align-items: stretch; }
-.section-heading { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); min-height: 66px; }
-.section-heading h2 { font-size: 30px; }
+.section-heading { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); min-height: clamp(50px, 6svh, 66px); }
+.section-heading h2 { font-size: clamp(25px, 3svh, 30px); }
 .all-writing { font-size: 17px; color: var(--muted); }
 .writing-list { list-style: none; margin: 0; padding: 0; }
-.writing-row { position: relative; padding: 23px 0 24px 34px; border-bottom: 1px solid var(--line); }
+.writing-row { position: relative; padding: clamp(12px, 1.6svh, 24px) 0 clamp(12px, 1.6svh, 24px) 34px; border-bottom: 1px solid var(--line); }
 .writing-row:last-child { border-bottom: 0; }
-.writing-row::before { content: ''; position: absolute; top: 22px; bottom: 24px; left: 0; width: 5px; background: var(--accent); opacity: 0; transform: scaleY(.6); transition: opacity 180ms, transform 240ms ease; }
+.writing-row::before { content: ''; position: absolute; inset: clamp(12px, 1.6svh, 24px) auto clamp(12px, 1.6svh, 24px) 0; width: 5px; background: var(--accent); opacity: 0; transform: scaleY(.6); transition: opacity 180ms, transform 240ms ease; }
 .writing-row.is-selected::before { opacity: 1; transform: scaleY(1); }
 .row-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.article-title { font-size: 37px; line-height: 1.35; letter-spacing: -.7px; text-decoration: none; }
-.preview-button { display: none; border: 0; color: var(--muted); background: none; font-size: 20px; text-decoration: underline; text-underline-offset: 5px; padding: 10px 0 10px 8px; }
+.article-title { font-size: clamp(26px, min(3vw, 3.6svh), 37px); line-height: 1.25; letter-spacing: -.7px; text-decoration: none; }
+.preview-button { display: none; min-height: 44px; border: 0; color: var(--muted); background: none; font-size: 20px; text-decoration: underline; text-underline-offset: 5px; padding: 6px 0 6px 8px; }
 [data-preview-ready] .preview-button { display: block; }
 .preview-button[aria-pressed='true'], .preview-button:hover { color: var(--accent); }
 .date, .eyebrow { font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace; font-size: 20px; letter-spacing: .02em; }
 .date { display: block; margin-top: 8px; }
-.writing-row-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; color: var(--muted); font-size: 17px; }
+.writing-row-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; color: var(--muted); font-size: 17px; }
 .writing-row-meta time { font: 14px ui-monospace, 'SFMono-Regular', Consolas, monospace; align-self: center; }
 /* Reserve the tallest preview's space; changing selections must not move the page. */
 .preview-panel { display: grid; position: relative; isolation: isolate; margin: 0 6px 10px 0; }
@@ -95,14 +98,14 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .preview-panel > [data-panel] { grid-area: 1 / 1; min-width: 0; z-index: 2; transform-origin: 50% 85%; }
 .preview-panel > [inert] { visibility: hidden; pointer-events: none; }
 .preview-panel > [data-leaving] { visibility: visible; z-index: 1; }
-.preview-copy { display: flex; flex-direction: column; align-items: flex-start; height: 100%; background: var(--surface); padding: 32px 36px; border: 1px solid var(--line); box-shadow: 0 5px 15px rgb(0 0 0 / .035); }
+.preview-copy { display: flex; flex-direction: column; align-items: flex-start; height: 100%; background: var(--surface); padding: clamp(22px, 3svh, 32px) clamp(24px, 3vw, 36px); border: 1px solid var(--line); box-shadow: 0 5px 15px rgb(0 0 0 / .035); }
 .preview-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; width: 100%; color: var(--muted); font: 13px ui-monospace, 'SFMono-Regular', Consolas, monospace; text-transform: uppercase; letter-spacing: .04em; }
 .preview-meta .writing-type { text-transform: uppercase; }
 .eyebrow { text-transform: uppercase; font-size: 17px; letter-spacing: .07em; }
-.preview-copy h3 { font-size: 37px; line-height: 1.2; margin: 24px 0 14px; }
-.preview-description { font-size: 28px; line-height: 1.25; }
-.preview-excerpt { font-size: 25px; line-height: 1.35; margin: 22px 0 28px; }
-.preview-copy .text-link { margin-top: auto; font-size: 24px; }
+.preview-copy h3 { font-size: clamp(26px, min(3vw, 3.6svh), 37px); line-height: 1.2; margin: clamp(14px, 2svh, 24px) 0 12px; }
+.preview-description { font-size: clamp(21px, 2.8svh, 28px); line-height: 1.25; }
+.preview-excerpt { font-size: clamp(19px, 2.6svh, 25px); line-height: 1.35; margin: clamp(14px, 2svh, 22px) 0 clamp(18px, 2.4svh, 28px); }
+.preview-copy .text-link { margin-top: auto; font-size: clamp(20px, 2.6svh, 24px); }
 .text-link { color: var(--accent); }
 .text-link:hover { text-decoration-thickness: 2px; }
 .mobile-preview { display: none; }
@@ -144,7 +147,7 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .site-footer { border-top: 1px solid var(--line); padding: 22px 0 30px; font-size: 23px; }
 .footer-links { display: flex; gap: 34px; }
 .site-footer a { text-decoration: none; }
-.page-heading { padding: 65px 0 55px; max-width: 760px; }
+.page-heading { padding: clamp(32px, 6svh, 65px) 0 clamp(28px, 5svh, 55px); max-width: 760px; }
 .page-heading h1 { font-size: clamp(58px, 7vw, 86px); line-height: 1.08; }
 .page-heading > p:not(.eyebrow) { font-size: 30px; margin-top: 22px; line-height: 1.3; }
 .archive-list { list-style: none; padding: 0; margin: 0 0 70px; }
@@ -156,7 +159,7 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .archive-list h2 { font-size: 36px; line-height: 1.2; }
 .archive-list h2 a { text-decoration: none; }
 .archive-list p { max-width: 680px; margin-top: 12px; font-size: 23px; }
-.essay { width: min(100%, 730px); margin: 0 auto; padding: 45px 0 65px; background: var(--paper); }
+.essay { width: min(100%, 730px); margin: 0 auto; padding: clamp(28px, 4.5svh, 45px) 0 65px; background: var(--paper); }
 .back-link { display: inline-flex; align-items: center; gap: 12px; font-size: 18px; text-decoration: none; color: var(--muted); margin-bottom: 38px; }
 .back-link .icon { width: 18px; height: 18px; }
 .essay-heading { margin-bottom: 35px; }
@@ -225,7 +228,7 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   :is(.primary-nav a, .footer-links a, .article-title, .archive-list h2 a, .next-essay a):is(:hover, :focus-visible, :active),
   .primary-nav a[aria-current='page'] { text-decoration: underline; }
 }
-.about { padding-top: 65px; }
+.about, .now-page { padding-top: clamp(32px, 6svh, 65px); }
 .about .prose img { width: 160px; }
 .missing-page { min-height: 65vh; }
 .missing-page .eyebrow { margin-bottom: 20px; }
@@ -235,24 +238,30 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (min-width: 761px) and (max-width: 1050px) {
   .site-frame { width: calc(100% - 56px); }
-  .site-header { gap: 25px; min-height: 82px; }
+  .site-header { gap: 25px; }
   .identity { font-size: 25px; }
   .primary-nav { gap: 18px; }
   .primary-nav, .appearance { font-size: 19px; }
-  .intro { gap: 24px; padding: 38px 0 46px; }
-  .intro h1 { font-size: 8.2vw; letter-spacing: -1px; }
-  .intro-copy { padding-top: 20px; }
-  .intro-copy p { font-size: 3.1vw; }
+  .intro { gap: 24px; }
+  .intro h1 { letter-spacing: -1px; }
   .intro-copy > a { font-size: 18px; margin-top: 18px; }
   .writing-preview { gap: 24px; }
-  .article-title, .preview-copy h3 { font-size: 27px; }
-  .writing-row { padding: 20px 0 20px 25px; }
+  .writing-row { padding-left: 25px; }
   .preview-copy { padding: 24px; }
-  .preview-description { font-size: 24px; }
-  .preview-excerpt { font-size: 21px; }
   .date { font-size: 15px; }
   .preview-button { font-size: 18px; }
-  .preview-copy .text-link { font-size: 23px; }
+}
+/* In short laptop windows, keep book identities alongside their covers instead
+   of spending the whole first view on the jackets. Tall windows keep the shelf. */
+@media (min-width: 1024px) and (max-height: 900px) {
+  .book-entry { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: start; gap: 22px; }
+  .book-jacket { width: 100%; margin: 0; }
+  .book-lettering { padding: 14px 10px 12px; gap: 12px; border-left-width: 5px; }
+  .book-lettering > :first-child { font-size: 16px; -webkit-line-clamp: 4; }
+  .book-lettering > :last-child { font-size: 11px; }
+  .book-copy h3 { font-size: 25px; }
+  .book-author { font-size: 16px; }
+  .book-note { font-size: 19px; }
 }
 @media (max-width: 760px) {
   body { font-size: 20px; }
@@ -262,15 +271,15 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
   .primary-nav { order: 3; width: 100%; gap: 26px; padding: 17px 0 18px; font-size: 17px; }
   .appearance { font-size: 16px; gap: 8px; }
   .appearance .icon { width: 21px; height: 21px; }
-  .intro { display: block; padding: 34px 0 39px; }
-  .intro h1 { font-size: clamp(48px, 11.7vw, 78px); line-height: 1.12; letter-spacing: -.8px; }
-  .intro-copy { padding-top: 27px; max-width: 480px; }
-  .intro-copy p { font-size: 27px; line-height: 1.3; }
+  .intro { display: block; padding: 26px 0 28px; }
+  .intro h1 { font-size: clamp(44px, 11.7vw, 78px); line-height: 1.12; letter-spacing: -.8px; }
+  .intro-copy { padding-top: 22px; max-width: 480px; }
+  .intro-copy p { font-size: 25px; line-height: 1.3; }
   .intro-copy > a { font-size: 18px; margin-top: 18px; }
   .writing-preview { display: block; }
   .section-heading { min-height: 49px; }
   .section-heading h2 { font-size: 24px; }
-  .writing-row { padding: 23px 0; }
+  .writing-row { padding: 18px 0; }
   .writing-row::before, [data-preview-ready] .preview-button, .preview-panel { display: none; }
   .article-title { font-size: 29px; }
   .date { font-size: 13px; }
