@@ -108,6 +108,20 @@ The colour variables at the top of `global.css` define light mode; `:root[data-t
 
 Appearance follows the reader’s system until they toggle it, then remembers their choice. After a visual change, check both themes, a narrow screen, keyboard focus and the article preview interaction. Keep the reduced-motion behaviour when editing transitions.
 
+### What should be visible on page load
+
+Use the browser's **content viewport in CSS pixels**, after its toolbar and tabs have taken their space; a laptop's physical display resolution is not its page area. At default zoom, check 1512×820 (a representative 14-inch MacBook window), 1440×800, 1366×680, 1280×720 and 1024×768, as well as a tall desktop window.
+
+- **Home:** navigation, the complete introduction and About link, all three selected titles and their metadata, and the complete active preview with its reading link. Changing the preview must keep these in view without moving the section. Lately, tools and the footer follow in the normal scroll flow.
+- **Writing:** the heading, introduction and complete first archive entry; the rest of the archive follows on scroll.
+- **About, Now and articles:** the heading, relevant metadata and the start of the actual content. Longer paragraphs and the rest of the piece scroll naturally; they do not need to fit a screen.
+- **Bookshelf:** the heading, introduction, first shelf heading and identifiable books. In desktop windows up to 900px tall, covers sit beside the titles and authors. Taller windows retain covers above the details.
+- **Phones:** at 390×744, show navigation, the introduction and the complete first selected article, including its Preview control. Smaller windows and enlarged text can require more scrolling.
+
+Homepage display type, preview type and spacing use both viewport width and small viewport height (`svh`) with fixed readable minimums. Shared headers and page-opening spacing also respond to height. Keep article prose at its reading size. Do not force content into `100vh`, hide overflow, truncate previews or scale the whole page to fit. At higher browser zoom, reflow and vertical scrolling take priority over fitting everything above the fold. Longer future titles or excerpts may also require scrolling.
+
+The viewport browser checks verify complete bounding rectangles rather than mere visibility, including all preview selections, both appearances, short laptop windows, mobile and the reduced CSS viewport at 200% zoom.
+
 On a fresh homepage visit, the headline arrives line by line, the introduction follows, the section rules draw and the desktop paper stack briefly fans apart. The sequence finishes within a second. A background tab waits until it is first shown, and phone viewport changes do not cancel it. Refreshing at the top replays the entrance; returning through site navigation, Back, a section link or a refresh partway down keeps the page still. Clicking, typing or scrolling settles it immediately.
 
 The headline responds to the pointer and ripples on a touch tap, then rests. Paper previews lift into place and expand into an article alongside its title. Clicking Appearance reveals the new theme from the icon; automatic system changes use a quiet crossfade. Reduced motion keeps everything still. These effects add no authoring requirements or animation dependencies.
