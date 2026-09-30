@@ -32,6 +32,7 @@ function applyTheme(animate = false, origin) {
     appearance.setAttribute('aria-label', `Appearance: ${action.toLowerCase()}`);
     appearance.title = action;
     root.dataset.mgReady = '';
+    for (const select of document.querySelectorAll('[data-mg-theme-choice]')) select.value = preference ?? 'system';
     for (const button of document.querySelectorAll('[data-mg-theme-reset]')) {
       button.disabled = preference === null;
       button.textContent = preference === null ? 'Appearance follows your system' : 'Use system appearance';
@@ -74,19 +75,21 @@ function applyTheme(animate = false, origin) {
     fadeTimer = setTimeout(() => root.classList.remove('theme-fade'), 400);
   }
 }
-appearance.addEventListener('click', () => {
-  preference = currentTheme() === 'light' ? 'dark' : 'light';
-  try { localStorage.setItem(preferenceKey, preference); } catch {}
-  const rect = appearance.querySelector('.mg-icon').getBoundingClientRect();
-  applyTheme(true, { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
-});
-for (const button of document.querySelectorAll('[data-mg-theme-reset]')) {
-  button.addEventListener('click', () => {
-    preference = null;
-    try { localStorage.removeItem(preferenceKey); } catch {}
-    applyTheme(true);
-  });
+// Both the masthead and legacy tool preferences use this single page owner.
+function chooseTheme(value, origin) {
+  preference = savedTheme(value);
+  try {
+    if(preference === null) localStorage.removeItem(preferenceKey);
+    else localStorage.setItem(preferenceKey, preference);
+  } catch {}
+  applyTheme(true, origin);
 }
+appearance.addEventListener('click', () => {
+  const rect = appearance.querySelector('.mg-icon').getBoundingClientRect();
+  chooseTheme(currentTheme() === 'light' ? 'dark' : 'light', { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
+});
+for (const button of document.querySelectorAll('[data-mg-theme-reset]')) button.addEventListener('click', () => chooseTheme(null));
+for (const select of document.querySelectorAll('[data-mg-theme-choice]')) select.addEventListener('change', () => chooseTheme(select.value));
 systemTheme.addEventListener('change', () => { if (preference === null) applyTheme(true); });
 window.addEventListener('storage', (event) => {
   if (event.key === preferenceKey || event.key === null) {
