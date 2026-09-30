@@ -9,7 +9,7 @@ test('personal pages are discoverable without becoming essays or feed entries', 
   await expect(page.getByRole('heading', { name: 'Now', exact: true })).toBeVisible();
   await expect(page.locator('.updated-date')).toContainText('27 September 2026');
   await expect(page.locator('.essay-meta, .next-essay')).toHaveCount(0);
-  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Bookshelf', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Elsewhere' }).getByRole('link', { name: 'Bookshelf', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Currently reading' })).toBeVisible();
   await expect(page.locator('.book-entry')).toHaveCount(3);
   await expect(page.locator('.book-jacket img')).toBeVisible();

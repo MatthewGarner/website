@@ -1,11 +1,11 @@
 :root {
-  --paper: #faf8f2;
-  --ink: #24212c;
+  --paper: var(--mg-paper);
+  --ink: var(--mg-ink);
   --heading: #24212c;
-  --muted: #686170;
-  --line: #c9c2d1;
-  --accent: #594278;
-  --surface: #eee9f3;
+  --muted: var(--mg-muted);
+  --line: var(--mg-line);
+  --accent: var(--mg-accent);
+  --surface: var(--mg-surface);
   --mark: #e4dbee;
   --display: 'Oswald Variable', Impact, sans-serif;
   --serif: 'Newsreader Variable', Georgia, serif;
@@ -15,14 +15,12 @@
   color: var(--ink);
   background: var(--paper);
 }
+/* Shared foundations own surfaces; prose keeps its established heading and highlight inks. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) { --heading: #e4ddef; --mark: #454c32; color-scheme: dark; }
+}
 :root[data-theme='dark'] {
-  --paper: #24212c;
-  --ink: #f4f0e6;
   --heading: #e4ddef;
-  --muted: #bdb5c8;
-  --line: #62596d;
-  --accent: #d6ec79;
-  --surface: #35303e;
   --mark: #454c32;
   color-scheme: dark;
 }
@@ -37,33 +35,10 @@ button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
 [hidden] { display: none !important; }
 h1, h2, h3, p { margin: 0; }
-h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(--display); font-weight: 600; }
+h1, h2, h3, .article-title { color: var(--heading); font-family: var(--display); font-weight: 600; }
 .site-frame { width: min(1120px, calc(100% - 80px)); margin-inline: auto; }
-.site-header { display: flex; align-items: center; gap: 36px; min-height: clamp(76px, 10svh, 100px); border-bottom: 1px solid var(--line); }
-.identity { font-size: 36px; line-height: 1.1; text-decoration: none; white-space: nowrap; margin-right: auto; }
-.primary-nav { display: flex; align-items: center; gap: 34px; font-size: 23px; }
-.primary-nav a { text-decoration: none; }
-.primary-nav a[aria-current='page'] { color: var(--accent); }
-.appearance { display: inline-flex; gap: 13px; align-items: center; min-height: 44px; padding: 6px 0; border: 0; background: none; color: inherit; font-size: 23px; user-select: none; }
-.appearance:hover { color: var(--accent); }
 .icon { display: inline-flex; width: 30px; height: 30px; flex-shrink: 0; }
 .icon svg { width: 100%; height: 100%; }
-.appearance .icon { transition: transform 380ms cubic-bezier(.22, 1, .36, 1); }
-:root[data-theme='dark'] .appearance .icon { transform: rotate(180deg); }
-/* Crossfade the same layout so theme changes do not move the reader's place. */
-::view-transition { pointer-events: none; }
-::view-transition-group(root), ::view-transition-old(root), ::view-transition-new(root) {
-  animation-duration: 380ms;
-  animation-timing-function: cubic-bezier(.22, 1, .36, 1);
-}
-.theme-fade, .theme-fade *, .theme-fade *::before, .theme-fade *::after {
-  transition: color 380ms ease, background-color 380ms ease, border-color 380ms ease;
-}
-:root[data-theme-reveal]::view-transition-old(root),
-:root[data-theme-reveal]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-:root[data-theme-reveal]::view-transition-old(root) { z-index: 1; }
-:root[data-theme-reveal]::view-transition-new(root) { z-index: 2; }
-:root[data-theme-reveal]::view-transition-group(root) { animation-duration: 620ms; }
 /* Initial desktop view: introduction, three selected titles and the full reading
    preview. Secondary sections continue below. Use the usable viewport height as
    well as width, with readable minimums and natural scrolling at higher zoom. */
@@ -145,7 +120,7 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .book-author { margin-top: 7px; color: var(--muted); font-size: 18px; }
 .book-note { margin-top: 15px; font-size: 21px; line-height: 1.4; }
 .site-footer { border-top: 1px solid var(--line); padding: 22px 0 30px; font-size: 23px; }
-.footer-links { display: flex; gap: 34px; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 12px 34px; }
 .site-footer a { text-decoration: none; }
 .page-heading { padding: clamp(32px, 6svh, 65px) 0 clamp(28px, 5svh, 55px); max-width: 760px; }
 .page-heading h1 { font-size: clamp(58px, 7vw, 86px); line-height: 1.08; }
@@ -202,15 +177,14 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .next-essay { display: grid; justify-items: start; gap: 14px; border-top: 1px solid var(--line); margin-top: 28px; padding-top: 25px; }
 .next-essay a { font-family: var(--display); font-size: 30px; color: var(--accent); }
 /* Draw on navigation and title links; retain native underlines throughout the prose. */
-:is(.primary-nav a, .footer-links a, .article-title, .archive-list h2 a, .next-essay a) {
+:is(.footer-links a, .article-title, .archive-list h2 a, .next-essay a) {
   text-decoration: none;
   background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0% 1px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   transition: background-size 240ms cubic-bezier(.22, 1, .36, 1), color 160ms ease;
 }
-:is(.primary-nav a, .footer-links a, .article-title, .archive-list h2 a, .next-essay a):is(:focus-visible, :active),
-.primary-nav a[aria-current='page'] { background-size: 100% 1px; }
+:is(.footer-links a, .article-title, .archive-list h2 a, .next-essay a):is(:focus-visible, :active) { background-size: 100% 1px; }
 :is(.intro-copy > a, .all-writing, .text-link, .tools-note a) > span[aria-hidden], .back-link .icon {
   display: inline-block;
   transition: transform 220ms cubic-bezier(.22, 1, .36, 1);
@@ -220,13 +194,12 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 :is(.intro-copy > a, .all-writing, .text-link, .tools-note a):is(:focus-visible, :active) > span[aria-hidden],
 .back-link:is(:focus-visible, :active) .icon { transform: translate(var(--arrow-x, 3px), var(--arrow-y, 0)); }
 @media (hover: hover) and (pointer: fine) {
-  :is(.primary-nav a, .footer-links a, .article-title, .archive-list h2 a, .next-essay a):hover { background-size: 100% 1px; }
+  :is(.footer-links a, .article-title, .archive-list h2 a, .next-essay a):hover { background-size: 100% 1px; }
   :is(.intro-copy > a, .all-writing, .text-link, .tools-note a):hover > span[aria-hidden],
   .back-link:hover .icon { transform: translate(var(--arrow-x, 3px), var(--arrow-y, 0)); }
 }
 @media (forced-colors: active) {
-  :is(.primary-nav a, .footer-links a, .article-title, .archive-list h2 a, .next-essay a):is(:hover, :focus-visible, :active),
-  .primary-nav a[aria-current='page'] { text-decoration: underline; }
+  :is(.footer-links a, .article-title, .archive-list h2 a, .next-essay a):is(:hover, :focus-visible, :active) { text-decoration: underline; }
 }
 .about, .now-page { padding-top: clamp(32px, 6svh, 65px); }
 .about .prose img { width: 160px; }
@@ -238,10 +211,6 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (min-width: 761px) and (max-width: 1050px) {
   .site-frame { width: calc(100% - 56px); }
-  .site-header { gap: 25px; }
-  .identity { font-size: 25px; }
-  .primary-nav { gap: 18px; }
-  .primary-nav, .appearance { font-size: 19px; }
   .intro { gap: 24px; }
   .intro h1 { letter-spacing: -1px; }
   .intro-copy > a { font-size: 18px; margin-top: 18px; }
@@ -266,11 +235,6 @@ h1, h2, h3, .identity, .article-title { color: var(--heading); font-family: var(
 @media (max-width: 760px) {
   body { font-size: 20px; }
   .site-frame { width: calc(100% - 40px); }
-  .site-header { flex-wrap: wrap; gap: 0; padding-top: 23px; min-height: 115px; }
-  .identity { font-size: 25px; }
-  .primary-nav { order: 3; width: 100%; gap: 26px; padding: 17px 0 18px; font-size: 17px; }
-  .appearance { font-size: 16px; gap: 8px; }
-  .appearance .icon { width: 21px; height: 21px; }
   .intro { display: block; padding: 26px 0 28px; }
   .intro h1 { font-size: clamp(44px, 11.7vw, 78px); line-height: 1.12; letter-spacing: -.8px; }
   .intro-copy { padding-top: 22px; max-width: 480px; }
