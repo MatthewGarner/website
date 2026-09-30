@@ -67,6 +67,7 @@
   let phrase = 0;
   let desiredOpen = details.open;
   let openingByReader = false;
+  let focusWasInside = false;
   let operation = 0;
 
   function stopSpecimen() {
@@ -157,11 +158,20 @@
     // Native external changes (including find-in-page) settle immediately, without replaying a fold.
     if (!details.open && (desiredOpen || folds.length) || details.open && !desiredOpen && !folds.length) {
       desiredOpen = details.open;
-      if (!desiredOpen && content.contains(document.activeElement)) summary.focus({ preventScroll: true });
+      // WebKit may blur hidden content before delivering the native toggle event.
+      if (!desiredOpen && (content.contains(document.activeElement) || focusWasInside && document.activeElement === document.body)) {
+        summary.focus({ preventScroll: true });
+      }
+      focusWasInside = false;
       finishFold();
     }
   });
+  content.addEventListener('focusout', event => {
+    // Keep the focus history only when closing the disclosure caused the blur.
+    if (details.open || event.relatedTarget) focusWasInside = false;
+  });
   content.addEventListener('focusin', () => {
+    focusWasInside = true;
     // Readers can enter the editor immediately; moving or clipped controls must never delay input.
     // WebKit's native focus scroll can cancel a smooth scroll started inside focusin.
     if (folds.length && desiredOpen) finishFold(true, 'instant');

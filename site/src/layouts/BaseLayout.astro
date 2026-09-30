@@ -1,14 +1,13 @@
 ---
-import '@fontsource-variable/oswald';
-import '@fontsource-variable/newsreader/standard.css';
 import '@fontsource-variable/newsreader/standard-italic.css';
 import '../styles/global.css';
+import '../identity/identity.css';
+import themeInitUrl from '../identity/theme-init.js?url&no-inline';
 import circleHalf from '@phosphor-icons/core/assets/fill/circle-half-fill.svg?raw';
 import ReadingTransition from '../components/ReadingTransition.astro';
 import Colophon from '../components/Colophon.astro';
 import HomeArrival from '../components/HomeArrival.astro';
 import { listedPersonalPages } from '../lib/content';
-import { personalPages } from '../lib/personal-pages';
 interface Props { title?: string; description?: string; article?: boolean; localDraft?: boolean; socialImage?: string; }
 const { title, description = 'Writing about technology, work and the things in between. Small tools for thinking clearly.', article = false, localDraft = false, socialImage } = Astro.props;
 const pageTitle = title ? `${title} — Matthew Garner` : 'Matthew Garner';
@@ -26,15 +25,7 @@ const availablePages = new Set((await listedPersonalPages()).map((note) => note.
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {current === '/' && <HomeArrival />}
     {(article || current === '/') && <ReadingTransition />}
-    <script is:inline>
-      (() => {
-        let preference = 'system';
-        try { preference = localStorage.getItem('mg:appearance') || 'system'; } catch {}
-        const dark = preference === 'dark' || (preference !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-      })();
-    </script>
+    <script is:inline src={themeInitUrl}></script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {localDraft && <meta name="robots" content="noindex, nofollow" />}
@@ -57,15 +48,16 @@ const availablePages = new Set((await listedPersonalPages()).map((note) => note.
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="site-frame">
-      <header class="site-header">
-        <a class="identity" href="/" aria-current={current === '/' ? 'page' : undefined}>Matthew Garner</a>
-        <nav class="primary-nav" aria-label="Main navigation">
+      <header class="mg-masthead site-header">
+        <a class="mg-identity identity" href="/" aria-current={current === '/' ? 'page' : undefined}>Matthew Garner</a>
+        <nav class="mg-nav primary-nav" aria-label="Main navigation">
           <a href="/writing" aria-current={current === '/writing' || current === '/writing/' ? 'page' : undefined}>Writing</a>
-          {personalPages.filter((page) => availablePages.has(page.id)).map((page) => <a href={`/${page.id}`} aria-current={current.replace(/\/$/, '') === `/${page.id}` ? 'page' : undefined}>{page.title}</a>)}
-          <a href="/about" aria-current={current === '/about' || current === '/about/' ? 'page' : undefined}>About</a>
+          <a href="https://tools.matthewgarner.me/">Tools</a>
+          <a href="https://energy.matthewgarner.me/">Energy</a>
+          {availablePages.has('now') && <a href="/now" aria-current={current.replace(/\/$/, '') === '/now' ? 'page' : undefined}>Now</a>}
         </nav>
-        <button class="appearance" type="button" aria-label="Appearance: toggle light and dark mode">
-          <span class="icon" aria-hidden="true" set:html={circleHalf} /><span>Appearance</span>
+        <button class="mg-appearance appearance" type="button" aria-label="Appearance: toggle light and dark mode">
+          <span class="mg-icon icon" aria-hidden="true" set:html={circleHalf} />
         </button>
       </header>
       <main id="main" tabindex="-1">
@@ -74,15 +66,18 @@ const availablePages = new Set((await listedPersonalPages()).map((note) => note.
       </main>
       <footer class="site-footer">
         <nav class="footer-links" aria-label="Elsewhere">
+          <a href="/about" aria-current={current.replace(/\/$/, '') === '/about' ? 'page' : undefined}>About</a>
+          {availablePages.has('bookshelf') && <a href="/bookshelf" aria-current={current.replace(/\/$/, '') === '/bookshelf' ? 'page' : undefined}>Bookshelf</a>}
           <a href="/index.xml">RSS</a>
           <a href="https://github.com/matthewgarner">GitHub</a>
           <a href="https://www.linkedin.com/in/matthew-garner-uk/">LinkedIn</a>
         </nav>
+        <button class="mg-theme-reset" type="button" data-mg-theme-reset>Use system appearance</button>
         <Colophon />
       </footer>
     </div>
     <script>
-      import '../scripts/appearance';
+      import '../identity/appearance.js';
     </script>
   </body>
 </html>

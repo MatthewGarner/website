@@ -125,5 +125,11 @@ test('missing animation support and external native changes preserve a usable di
   await expect(summary).toBeFocused();
   await expect(disclosure.locator('.colophon-content')).toHaveAttribute('inert', '');
   await expect(disclosure).not.toHaveAttribute('data-fold');
+  await disclosure.evaluate(element => { (element as HTMLDetailsElement).open = true; });
+  await page.getByRole('textbox', { name: 'Your words' }).focus();
+  const appearance = page.getByRole('button', { name: /^Appearance:/ });
+  await appearance.focus();
+  await disclosure.evaluate(element => { (element as HTMLDetailsElement).open = false; });
+  await expect(appearance).toBeFocused();
   expect(errors).toEqual([]);
 });

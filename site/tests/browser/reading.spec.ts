@@ -179,7 +179,7 @@ test('reduced motion disables preview, theme and navigation animation', async ({
   });
   await page.goto('/');
   await page.getByRole('button', { name: 'Preview Drifting', exact: true }).click();
-  await page.getByRole('button', { name: /Appearance/ }).click();
+  await page.getByRole('button', { name: /^Appearance:/ }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   expect(await page.evaluate(() => (window as any).motionCalls)).toBe(0);
   await expect(page.locator('.appearance .icon')).toHaveCSS('transition-duration', '0s');
@@ -200,7 +200,7 @@ test('system appearance updates until overridden; unsupported features retain ba
   await page.goto('/');
   await page.emulateMedia({ colorScheme: 'dark' });
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.getByRole('button', { name: /Appearance/ }).click();
+  await page.getByRole('button', { name: /^Appearance:/ }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.getByRole('button', { name: 'Preview Drifting', exact: true }).click();
   await page.getByRole('link', { name: 'Read the note', exact: true }).click();
@@ -261,7 +261,7 @@ test('theme controls survive blocked browser storage and rapid activation', asyn
   page.on('pageerror', error => errors.push(error.message));
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
-  const toggle = page.getByRole('button', { name: /Appearance/ });
+  const toggle = page.getByRole('button', { name: /^Appearance:/ });
   await toggle.click();
   await toggle.click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');

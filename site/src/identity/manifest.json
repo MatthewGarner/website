@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "source": "MatthewGarner/website:site/src/identity",
+  "files": {
+    "appearance.js": "d935976b525d845c2163c5abb8b62500de258f98eded51ca3186d1cfde1e8d7a",
+    "fonts/newsreader-LICENSE.txt": "26028ec4e13b650065fa525a09532176f8a668b76ff849ea01c564a7480f91e7",
+    "fonts/newsreader-latin-standard-normal.woff2": "6e4f2958c3a7c4a80acde4e5a679abe7e01bc1e30b92be3c7a8b696ef401d101",
+    "fonts/oswald-LICENSE.txt": "23916cdee678823c3c517c699cb2e043088de0d46c959eeaa168b54bb84534df",
+    "fonts/oswald-latin-wght-normal.woff2": "bd73278ee0c50041b91b4c03d1229e35b501637f46b6409e7da2d3a758446ea5",
+    "icons-LICENSE.txt": "b5b1f1da112d18ea2147decfd48ddc1bf2b5aeb6c265381579340e95b15a2bb2",
+    "identity.css": "a68a81c3c1fc4450341e5b4e636cf46cacd834fbe3790477b19296f8c3324111",
+    "theme-init.js": "cf115ac48cf015510d3b38e6c28ae63080939bf1303997d816a3c6adf4ff1075"
+  }
+}

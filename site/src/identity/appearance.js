@@ -1,22 +1,20 @@
-// These entry points are modules; their media queries must not share a global scope.
-export {};
+/* Identity v1. Shared presentation only; never writes a tool's model or history. */
 
 const preferenceKey = 'mg:appearance';
 const systemTheme = matchMedia('(prefers-color-scheme: dark)');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const appearance = document.querySelector<HTMLButtonElement>('.appearance')!;
+const appearance = document.querySelector('.mg-appearance');
 const root = document.documentElement;
-type Theme = 'light' | 'dark';
-const savedTheme = (value: string | null): Theme | null => value === 'light' || value === 'dark' ? value : null;
-let preference: Theme | null = null;
+const savedTheme = (value) => value === 'light' || value === 'dark' ? value : null;
+let preference = null;
 try { preference = savedTheme(localStorage.getItem(preferenceKey)); } catch {}
-const currentTheme = (): Theme => preference ?? (systemTheme.matches ? 'dark' : 'light');
-let transition: ViewTransition | undefined;
-let reveal: Animation | undefined;
+const currentTheme = () => preference ?? (systemTheme.matches ? 'dark' : 'light');
+let transition;
+let reveal;
 let revision = 0;
-let fadeTimer: ReturnType<typeof setTimeout>;
+let fadeTimer;
 
-function applyTheme(animate = false, origin?: { x: number; y: number }) {
+function applyTheme(animate = false, origin) {
   const theme = currentTheme();
   const change = ++revision;
   transition?.skipTransition();
@@ -33,6 +31,16 @@ function applyTheme(animate = false, origin?: { x: number; y: number }) {
     const action = `Switch to ${theme === 'light' ? 'dark' : 'light'} mode`;
     appearance.setAttribute('aria-label', `Appearance: ${action.toLowerCase()}`);
     appearance.title = action;
+    root.dataset.mgReady = '';
+    for (const select of document.querySelectorAll('[data-mg-theme-choice]')) select.value = preference ?? 'system';
+    for (const button of document.querySelectorAll('[data-mg-theme-reset]')) {
+      button.disabled = preference === null;
+      button.textContent = preference === null ? 'Appearance follows your system' : 'Use system appearance';
+    }
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+      meta.removeAttribute('media');
+      meta.content = theme === 'dark' ? '#24212c' : '#faf8f2';
+    }
   };
   if (!animate || reducedMotion.matches || root.dataset.theme === theme) {
     update();
@@ -67,12 +75,21 @@ function applyTheme(animate = false, origin?: { x: number; y: number }) {
     fadeTimer = setTimeout(() => root.classList.remove('theme-fade'), 400);
   }
 }
+// Both the masthead and legacy tool preferences use this single page owner.
+function chooseTheme(value, origin) {
+  preference = savedTheme(value);
+  try {
+    if(preference === null) localStorage.removeItem(preferenceKey);
+    else localStorage.setItem(preferenceKey, preference);
+  } catch {}
+  applyTheme(true, origin);
+}
 appearance.addEventListener('click', () => {
-  preference = currentTheme() === 'light' ? 'dark' : 'light';
-  try { localStorage.setItem(preferenceKey, preference); } catch {}
-  const rect = appearance.querySelector('.icon')!.getBoundingClientRect();
-  applyTheme(true, { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
+  const rect = appearance.querySelector('.mg-icon').getBoundingClientRect();
+  chooseTheme(currentTheme() === 'light' ? 'dark' : 'light', { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
 });
+for (const button of document.querySelectorAll('[data-mg-theme-reset]')) button.addEventListener('click', () => chooseTheme(null));
+for (const select of document.querySelectorAll('[data-mg-theme-choice]')) select.addEventListener('change', () => chooseTheme(select.value));
 systemTheme.addEventListener('change', () => { if (preference === null) applyTheme(true); });
 window.addEventListener('storage', (event) => {
   if (event.key === preferenceKey || event.key === null) {

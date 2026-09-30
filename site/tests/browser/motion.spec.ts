@@ -84,7 +84,7 @@ test('theme reveal starts at the switch, reaches the far corner, and releases th
   await page.goto('/');
   const icon = (await page.locator('.appearance .icon').boundingBox())!;
   const position = { x: icon.x + icon.width / 2, y: icon.y + icon.height / 2 };
-  await page.getByRole('button', { name: /Appearance/ }).press('Enter');
+  await page.getByRole('button', { name: /^Appearance:/ }).press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   const native = await page.evaluate(() => typeof document.startViewTransition === 'function');
   if (native) {
@@ -105,7 +105,7 @@ test('changing motion preference stops active headline, paper and theme animatio
   await page.locator('.headline-ink').nth(4).hover();
   await expect.poll(async () => Math.min(...await inkWeights(page))).toBeLessThan(650);
   await page.getByRole('button', { name: 'Preview Drifting', exact: true }).press('Enter');
-  await page.getByRole('button', { name: /Appearance/ }).press('Enter');
+  await page.getByRole('button', { name: /^Appearance:/ }).press('Enter');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect.poll(async () => (await inkWeights(page)).every(weight => weight === 700)).toBe(true);
   await expect(page.locator('[data-leaving], [data-theme-reveal]')).toHaveCount(0);
@@ -126,7 +126,7 @@ test('a browser rejecting snapshot animation still switches themes without an er
     };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: /Appearance/ }).click();
+  await page.getByRole('button', { name: /^Appearance:/ }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('[data-theme-reveal]')).toHaveCount(0);
   expect(errors).toEqual([]);

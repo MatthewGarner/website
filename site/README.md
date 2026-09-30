@@ -145,7 +145,7 @@ npm run test:browser
 
 The suite builds an isolated copy with the reading sample, never adding fixtures to `content/`. It checks keyboard and touch controls, reduced motion, missing features, blocked storage and clipboard access, light/dark contrast, and print output in Chromium and WebKit. GitHub runs it automatically. Print screenshots and the Chromium PDF are written under `site/test-results/`; failed runs retain traces. Physical devices and screen-reader use still benefit from occasional manual checks.
 
-Interaction code lives in `src/components/HomeArrival.astro`, `ResponsiveHeadline.astro`, `ReadingTransition.astro`, `ReadingDetails.astro`, `Footnotes.astro`, `QuotePassage.astro` and `Colophon.astro`, plus `src/scripts/previews.ts` and `appearance.ts`. Link effects, print and shared motion rules live in `src/styles/global.css`.
+Interaction code lives in `src/components/HomeArrival.astro`, `ResponsiveHeadline.astro`, `ReadingTransition.astro`, `ReadingDetails.astro`, `Footnotes.astro`, `QuotePassage.astro` and `Colophon.astro`, plus `src/scripts/previews.ts` and `src/identity/appearance.js`. Link effects, print and shared motion rules live in `src/styles/global.css`.
 
 Do not hand-edit `site/dist/`, `site/.assets/`, `site/.astro/` or `.vercel/output/`; builds regenerate them. Publishing rules live in `src/lib/publishing.ts`, Markdown handling in `src/lib/obsidian.ts` and `src/lib/markdown.ts`, and rendering configuration in `astro.config.ts`.
 
@@ -162,3 +162,10 @@ Do not hand-edit `site/dist/`, `site/.assets/`, `site/.astro/` or `.vercel/outpu
 | Node or dependency errors | Use Node 24 and rerun `npm ci`. |
 | Preview exits before starting, or a local request reports `EPERM` | A restricted execution environment can block listening on or connecting to a local port. Allow local-server access there, or run the command in your normal terminal. |
 | A Git push succeeds but the live site stays old | Check the branch and the Vercel build log. Only `v5` publishes production; an errored build leaves the previous site live. |
+
+### Shared identity
+
+`src/identity/` owns the family masthead, local Oswald/Newsreader fonts and appearance
+behaviour. Tools vendors a versioned copy using its identity sync command; neither
+site fetches another site's assets at runtime. Appearance defaults to the OS, saves
+an override on this origin, and returns to the OS through the footer control.
