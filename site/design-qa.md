@@ -106,3 +106,21 @@ Inspected the entrance mid-frame and at rest, plus the footer playground on desk
 The missing entrance report exposed two reproducible lifecycle gaps: any resize notification cancelled the animation, and an initially hidden document never started when first shown. Mobile tests reproduced both failures before the fix. Viewport changes and zero-offset scroll notifications now leave the entrance running; a new background tab starts when it becomes visible. Removed the session marker so fresh visits and refreshes at the top replay the entrance. Internal navigation, Back, hash links, reduced motion and scrolled reloads remain still.
 
 All 20 entrance checks passed in Chromium and WebKit, including six new phone cases using touch/mobile emulation, viewport-height changes, background activation and a stale session marker. The complete browser suite now contains 90 cases. The phone layout was also inspected in the in-app browser with no console errors. These are emulated lifecycle checks; the user's physical iPhone remains unverified. The refresh test uses a fresh top-of-page context because WebKit can retain a previous reload's scroll restoration point after programmatic scrolling.
+
+## Tall condensed M favicon — 30 September 2026
+
+final result: passed
+
+Source: selected option 1, `/workspace/generated_images/exec-aa54f59b-6405-4e76-8d9b-a03a44d48145.png` (1254 × 1254 design board). Image Gen isolated the selected badge into `/workspace/generated_images/exec-095999cb-c9c5-40ab-ae24-fd62123929d9.png`; transparent outer margins were trimmed before exporting the 512px PNG and six ICO frames.
+
+Compared the source badge crop (471 × 474px, normalized to 256 × 256px) with the actual ICO rendered by WebKit at 256 CSS pixels and deviceScaleFactor 1. The combined evidence is `/workspace/favicon-review/source-vs-implementation.png`, source left and implementation right. Additional focused captures are `/workspace/favicon-review/chromium-sizes.png` and `/workspace/favicon-review/webkit-sizes.png` (800 × 780 CSS pixels, deviceScaleFactor 1), showing 16, 32, 48 and 64px icons on paper and deep plum. `/workspace/favicon-review/webkit-retina-sizes.png` uses a 480 × 160 CSS viewport at deviceScaleFactor 2 (960 × 320 screenshot pixels). This temporary asset inspection page is outside the published site; its labels and layout are not part of the favicon.
+
+- Typography: the heavy condensed M silhouette, straight stems, deep central V and tapered counters match the selected mark. The letter remains an image, with no font substitution or fallback dependency.
+- Spacing: the badge and letter retain the reference's proportions, optical centering and rounded corners. Surrounding presentation-board space is removed; only transparent corner space remains in the square icon.
+- Colours: paper lettering on deep plum follows the selected design in both appearances. Its subtle raster shading is retained; the letter stays clear when the badge blends into a dark tab background.
+- Image quality: inspected the combined 256px comparison and native small-size browser captures, including Retina density. All six 16/32/48/64/128/256px ICO frames decode at their declared dimensions with alpha. Browser rasterization differs slightly at small sizes, with no actionable fidelity issue.
+- Copy: only the chosen M appears in the asset. Concept headings, browser mockups and sample labels are excluded. Site copy remains unchanged.
+
+No P0/P1/P2 findings or visual correction loop was required. The release check returned zero diagnostics; all 24 publishing tests passed and Vercel packaging completed. All 11 generated pages using the shared layout reference the versioned icon URL and correct sizes. Chromium and WebKit both fetched the exact exported ICO with HTTP 200 and the icon MIME type, decoded the PNG and ICO images, and reported no page errors. Browser tab chrome itself was not captured by the headless checks.
+
+Implementation checklist complete: PNG and multi-size ICO replaced, shared favicon URL versioned for cache refresh, export guidance documented, source/implementation comparison inspected, and release/browser checks passed.

@@ -102,9 +102,11 @@ Use a preview branch for design work. These are the main places to edit; ordinar
 | Writing archive layout | [src/pages/writing.astro](src/pages/writing.astro) |
 | Homepage article preview content | [src/components/Preview.astro](src/components/Preview.astro) |
 | About page layout and its search description | [src/pages/about.astro](src/pages/about.astro) |
-| Browser icon and default social image | `content/static/icon.ico` and `content/static/og-image.png`; writing cards are generated during the build. |
+| Browser icon and default social image | `content/static/icon.png`, `content/static/icon.ico` and `content/static/og-image.png`; writing cards are generated during the build. |
 
 The colour variables at the top of `global.css` define light mode; `:root[data-theme='dark']` defines dark mode. Fonts are imported in `BaseLayout.astro` and selected through `--display` and `--serif` in the stylesheet. Both fonts are served locally.
+
+The browser icon is the tall condensed M in paper on deep plum. Keep its transparent corners when exporting the 512px PNG and the ICO's 16, 32, 48, 64, 128 and 256px frames. When replacing it, update the favicon URL version in `BaseLayout.astro` so browsers refresh their cached icon.
 
 Appearance follows the reader’s system until they toggle it, then remembers their choice. After a visual change, check both themes, a narrow screen, keyboard focus and the article preview interaction. Keep the reduced-motion behaviour when editing transitions.
 
