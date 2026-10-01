@@ -32,7 +32,7 @@
 .mg-footer a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:none}
 .mg-footer a:hover{color:var(--mg-accent);text-decoration:underline}
 [data-mg-theme-reset]{min-height:44px;padding:8px 0;background:none;border:0;color:var(--mg-muted);font:400 15px/1.4 var(--mg-serif);text-align:left;cursor:pointer}
-[data-mg-theme-reset]:disabled{cursor:default;opacity:1}
+[data-mg-theme-reset][hidden]{display:none}
 .mg-skip{position:absolute;left:20px;top:-100px;z-index:100;padding:12px;background:var(--mg-paper);color:var(--mg-ink)}
 .mg-skip:focus{top:10px}
 /* Theme transitions preserve the reader's scroll position and respect motion settings. */
