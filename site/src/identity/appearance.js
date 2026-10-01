@@ -34,8 +34,7 @@ function applyTheme(animate = false, origin) {
     root.dataset.mgReady = '';
     for (const select of document.querySelectorAll('[data-mg-theme-choice]')) select.value = preference ?? 'system';
     for (const button of document.querySelectorAll('[data-mg-theme-reset]')) {
-      button.disabled = preference === null;
-      button.textContent = preference === null ? 'Appearance follows your system' : 'Use system appearance';
+      button.hidden = preference === null;
     }
     for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
       meta.removeAttribute('media');
@@ -88,7 +87,10 @@ appearance.addEventListener('click', () => {
   const rect = appearance.querySelector('.mg-icon').getBoundingClientRect();
   chooseTheme(currentTheme() === 'light' ? 'dark' : 'light', { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
 });
-for (const button of document.querySelectorAll('[data-mg-theme-reset]')) button.addEventListener('click', () => chooseTheme(null));
+for (const button of document.querySelectorAll('[data-mg-theme-reset]')) button.addEventListener('click', () => {
+  chooseTheme(null);
+  appearance.focus({ preventScroll: true });
+});
 for (const select of document.querySelectorAll('[data-mg-theme-choice]')) select.addEventListener('change', () => chooseTheme(select.value));
 systemTheme.addEventListener('change', () => { if (preference === null) applyTheme(true); });
 window.addEventListener('storage', (event) => {

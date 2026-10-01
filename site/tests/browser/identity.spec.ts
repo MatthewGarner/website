@@ -18,6 +18,7 @@ test('shared navigation keeps personal pages reachable and uses canonical collec
 test('device appearance restores live OS following after a saved override', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
   await page.goto('/');
+  await expect(page.locator('[data-mg-theme-reset]')).toBeHidden();
   await page.getByRole('button', { name: /Appearance:/ }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
@@ -25,6 +26,8 @@ test('device appearance restores live OS following after a saved override', asyn
   await page.getByRole('button', { name: 'Use system appearance', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   expect(await page.evaluate(() => localStorage.getItem('mg:appearance'))).toBeNull();
+  await expect(page.locator('[data-mg-theme-reset]')).toBeHidden();
+  await expect(page.getByRole('button', { name: /Appearance:/ })).toBeFocused();
   await page.emulateMedia({ colorScheme: 'dark' });
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.emulateMedia({ colorScheme: 'light' });
