@@ -3,9 +3,8 @@ import { test, expect } from '@playwright/test';
 test('shared navigation keeps personal pages reachable and uses canonical collection origins', async ({ page }) => {
   await page.goto('/');
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
-  await expect(nav.getByRole('link')).toHaveText(['Writing', 'Tools', 'Energy', 'Now']);
-  await expect(nav.getByRole('link', { name: 'Tools', exact: true })).toHaveAttribute('href', 'https://tools.matthewgarner.me/');
-  await expect(nav.getByRole('link', { name: 'Energy', exact: true })).toHaveAttribute('href', 'https://energy.matthewgarner.me/');
+  await expect(nav.getByRole('link')).toHaveText(['Writing', 'Tools Lab', 'Now']);
+  await expect(nav.getByRole('link', { name: 'Tools Lab', exact: true })).toHaveAttribute('href', 'https://tools.matthewgarner.me/');
   await nav.getByRole('link', { name: 'Writing', exact: true }).click();
   await expect(nav.getByRole('link', { name: 'Writing', exact: true })).toHaveAttribute('aria-current', 'page');
   const footer = page.getByRole('navigation', { name: 'Elsewhere' });

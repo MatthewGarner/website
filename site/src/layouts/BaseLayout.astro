@@ -52,8 +52,7 @@ const availablePages = new Set((await listedPersonalPages()).map((note) => note.
         <a class="mg-identity identity" href="/" aria-current={current === '/' ? 'page' : undefined}>Matthew Garner</a>
         <nav class="mg-nav primary-nav" aria-label="Main navigation">
           <a href="/writing" aria-current={current === '/writing' || current === '/writing/' ? 'page' : undefined}>Writing</a>
-          <a href="https://tools.matthewgarner.me/">Tools</a>
-          <a href="https://energy.matthewgarner.me/">Energy</a>
+          <a href="https://tools.matthewgarner.me/">Tools Lab</a>
           {availablePages.has('now') && <a href="/now" aria-current={current.replace(/\/$/, '') === '/now' ? 'page' : undefined}>Now</a>}
         </nav>
         <button class="mg-appearance appearance" type="button" aria-label="Appearance: toggle light and dark mode">
