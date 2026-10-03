@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { stripComments } from './markdown';
+import { stripComments, stripToolBlocks } from './markdown';
 
 export const CONTENT_DIR = path.resolve(import.meta.dirname, '../../../content');
 const excluded = new Set(['private', 'templates']);
@@ -96,7 +96,7 @@ export function resolveAsset(target: string, from: string, root = CONTENT_DIR): 
 }
 
 export function plainText(markdown: string): string {
-  return stripComments(markdown).replace(/!\[.*?\]\(.*?\)|!\[\[.*?\]\]/g, '')
+  return stripToolBlocks(stripComments(markdown)).replace(/!\[.*?\]\(.*?\)|!\[\[.*?\]\]/g, '')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/\[\[(?:[^|\]]+\|)?([^\]]+)\]\]/g, '$1')
     .replace(/<[^>]+>/g, '').replace(/==|[*_`>#]/g, '').replace(/\s+/g, ' ').trim();
 }

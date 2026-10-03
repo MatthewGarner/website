@@ -61,3 +61,15 @@ export function prepareMarkdown(source: string): string {
   }
   return result + visible.slice(cursor);
 }
+
+/** Embed configuration is not article prose or a feed description. */
+export function stripToolBlocks(source: string): string {
+  const ranges: Range[] = [];
+  visit(fromMarkdown(source), 'code', node => {
+    if (node.lang === 'tool' && node.position?.start.offset !== undefined && node.position.end.offset !== undefined) {
+      ranges.push({ start: node.position.start.offset, end: node.position.end.offset });
+    }
+  });
+  for (const range of ranges.reverse()) source = source.slice(0, range.start) + source.slice(range.end);
+  return source;
+}

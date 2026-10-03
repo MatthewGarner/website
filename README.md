@@ -9,6 +9,7 @@ Write in Obsidian, save Markdown in `content/`, then commit and push to `v5` to 
 | I want to… | Read |
 | --- | --- |
 | Write or edit a piece, add images, choose homepage articles | [Writing and editing](site/AUTHORING.md) |
+| Write an article with an interactive tool or saved illustration | [Tool article workflow](site/TOOL-ARTICLES.md) |
 | Update Now or add a book to Bookshelf | [Personal pages](site/AUTHORING.md#now-and-bookshelf) |
 | Publish, review a preview or take a piece down | [Publishing](site/PUBLISHING.md) |
 | Run the site locally, change the design or fix a build | [Running and customising the site](site/README.md) |

@@ -4,6 +4,17 @@
 
 The Astro app lives in `site/` and reads the original Markdown from `content/`. **Run the commands in this guide from the repository root** (`/Users/matthew/repos/website` on this Mac). Root commands forward to the Astro app; you do not need to change into `site/`.
 
+Article tool blocks use `src/lib/tool-embeds.ts` for validated example manifests
+and Markdown rendering, and `src/scripts/tool-embeds.ts` for opt-in frames, theme
+messages and resizing. [Authoring examples](TOOL-ARTICLES.md) stay
+with the content. The Tools repo owns `/embed/v1/` and its frozen calculations;
+add a supported view to both registries before using it in writing. The website
+build needs no checkout of Tools and never fetches tool code while building.
+With both local servers running as described in the authoring guide, run
+`node site/scripts/check-tool-embed.mjs` from the repository root to exercise the
+actual Flow demonstration in Chromium and WebKit. It checks the current-input
+handoff to Flow and writes desktop/phone screenshots to `site/test-results/tool-embed/`.
+
 ## First setup
 
 You need Git and **Node.js 24**, which includes npm. Check your installation:

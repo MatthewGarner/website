@@ -16,6 +16,7 @@
     "build:release": "npm --prefix site run build:release",
     "preview": "npm --prefix site run preview --",
     "check": "npm --prefix site run check",
+    "check:tool-examples": "npm --prefix site run check:tool-examples",
     "check:hosted": "npm --prefix site run check:hosted --",
     "test": "npm --prefix site test",
     "test:browser": "npm --prefix site run test:browser --"

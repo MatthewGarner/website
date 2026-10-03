@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="448" viewBox="0 0 720 448" role="img" aria-labelledby="title description">
+<title id="title">How demand creates waiting</title>
+<desc id="description">Flow plots average waiting against demand from 0.5 to 10 items/week. 1 working day waiting on average at 8 items/week. Capacity: 10 items/week. At or above capacity, the queue cannot settle. 4 people, average item 2 days, WIP 4, medium variability. Fixed-seed simulation, not a delivery forecast.</desc>
+<rect width="720" height="448" fill="#FBFBFA"/>
+<g font-family="system-ui, sans-serif" fill="#111111">
+<text x="32" y="32" font-size="12" fill="#6B6B68" letter-spacing="1">FLOW · ARTICLE EXAMPLE</text>
+<text x="32" y="66" font-size="26" font-weight="650">How demand creates waiting</text>
+<text x="72" y="108" font-size="14" fill="#6B6B68">Average waiting · working days</text>
+
+<line x1="72" x2="672" y1="278" y2="278" stroke="#D9D9D5"/><text x="60" y="283" font-size="14" text-anchor="end" fill="#6B6B68">0</text>
+<line x1="72" x2="672" y1="200" y2="200" stroke="#D9D9D5"/><text x="60" y="205" font-size="14" text-anchor="end" fill="#6B6B68">3</text>
+<line x1="72" x2="672" y1="122" y2="122" stroke="#D9D9D5"/><text x="60" y="127" font-size="14" text-anchor="end" fill="#6B6B68">6</text>
+<text x="72" y="300" font-size="14" text-anchor="middle" fill="#6B6B68">0</text>
+<text x="192" y="300" font-size="14" text-anchor="middle" fill="#6B6B68">2</text>
+<text x="312" y="300" font-size="14" text-anchor="middle" fill="#6B6B68">4</text>
+<text x="432" y="300" font-size="14" text-anchor="middle" fill="#6B6B68">6</text>
+<text x="552" y="300" font-size="14" text-anchor="middle" fill="#6B6B68">8</text>
+<text x="672" y="300" font-size="14" text-anchor="middle" fill="#6B6B68">10</text>
+<text x="372" y="324" font-size="14" text-anchor="middle" fill="#6B6B68">Demand · items per week</text>
+<line data-capacity="10" x1="672" x2="672" y1="122" y2="278" stroke="#6B6B68" stroke-dasharray="4 4"/>
+<polyline data-wait-curve="true" points="102,278 132,277.99999999999994 162,277.99999999999994 192,277.9971032035005 222,277.8586348097242 252,277.63285414527377 282,277.3436283109246 312,276.8147979412945 342,276.05467255182407 372,275.00442370099546 402,273.5518588517874 432,271.73566195770536 462,269.6195347417031 492,265.5738428064653 522,260.78738563119424 552,252.7152869967696 582,238.97289361936402 612,215.69100747687264 642,147.44927222443565" fill="none" stroke="#1F4FD8" stroke-width="3" stroke-linejoin="round"/>
+
+
+<circle data-selected-demand="8" cx="552" cy="252.7152869967696" r="6" fill="#1F4FD8" stroke="#FBFBFA" stroke-width="2"/>
+<text x="32" y="360" font-size="18" font-weight="600">1 working day waiting on average at 8 items/week.</text>
+<text x="32" y="382" font-size="13" fill="#6B6B68">Capacity: 10 items/week. At or above capacity, the queue cannot settle.</text>
+<text x="32" y="409" font-size="13" fill="#6B6B68">4 people · average item 2 days · WIP 4 · medium variability</text>
+<text x="32" y="431" font-size="12" fill="#6B6B68">Fixed-seed simulation · one queue · not a delivery forecast</text>
+</g>
+</svg>
