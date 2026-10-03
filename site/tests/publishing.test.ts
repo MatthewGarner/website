@@ -80,3 +80,24 @@ test('notes and aliases cannot shadow generated social images', () => {
     }
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
+
+test('canonical paths and aliases cannot shadow another page through legacy HTML routes', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'site-route-collisions-'));
+  const write = (file: string, properties: string) => fs.writeFileSync(path.join(root, file), `---\ntitle: Example\n${properties}\n---\nAn essay.`);
+  try {
+    write('First.md', 'slug: example\naliases: [old-example]');
+    for (const properties of [
+      'slug: example.html', 'slug: example/index.html',
+      'slug: another\naliases: [example.html]', 'slug: old-example.html',
+      'slug: another\naliases: [old-example/index.html]',
+      'slug: about.html', 'slug: writing/index.html', 'slug: index.html',
+    ]) {
+      write('Second.md', properties);
+      assert.throws(() => noteSources(root), /Conflicting public route/);
+    }
+    // Overlapping aliases to the same destination are harmless and remain usable.
+    fs.unlinkSync(path.join(root, 'Second.md'));
+    write('First.md', 'slug: example\naliases: [old-example, old-example.html]');
+    assert.equal(noteSources(root).length, 1);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});

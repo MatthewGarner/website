@@ -46,7 +46,7 @@ export interface NoteSource {
 }
 
 export function noteSources(root = CONTENT_DIR, { includeDrafts = false } = {}): NoteSource[] {
-  return contentFiles(root).filter((file) => file.endsWith('.md')).flatMap((file) => {
+  const notes = contentFiles(root).filter((file) => file.endsWith('.md')).flatMap((file) => {
     const { data } = matter.read(file);
     if (!includeDrafts && !isPublished(data)) return [];
     const relative = path.relative(root, file).split(path.sep).join('/');
@@ -58,9 +58,35 @@ export function noteSources(root = CONTENT_DIR, { includeDrafts = false } = {}):
     }
     return [{ file, relative, slug, title: String(data.title ?? path.basename(file, '.md')), aliases }];
   });
+  validatePublicRoutes(notes);
+  return notes;
 }
 
 export const noteHref = (slug: string): string => slug === 'index' ? '/about' : `/${slug.split('/').map(encodeURIComponent).join('/')}`;
+
+function validatePublicRoutes(notes: NoteSource[]) {
+  const routes = new Map<string, string>();
+  const claim = (route: string, destination: string) => {
+    const previous = routes.get(route);
+    if (previous && previous !== destination) {
+      throw new Error(`Conflicting public route /${route}: ${previous} and ${destination}`);
+    }
+    routes.set(route, destination);
+  };
+  // Packaging also serves old .html and /index.html addresses. Validate those
+  // expanded routes before building, or /foo.html can redirect to another article.
+  const page = (slug: string, destination: string) => {
+    for (const route of [slug, `${slug}/`, `${slug}.html`, `${slug}/index.html`]) claim(route, destination);
+  };
+  for (const route of ['', 'index', 'index.html']) claim(route, '/');
+  for (const slug of ['writing', 'about', 'now', 'bookshelf', '404']) page(slug, `/${slug}`);
+  for (const route of ['index.xml', 'sitemap.xml']) claim(route, `/${route}`);
+  for (const note of notes) {
+    const destination = noteHref(note.slug);
+    page(note.slug === 'index' ? 'about' : note.slug, destination);
+    for (const alias of note.aliases) page(safeSlug(alias), destination);
+  }
+}
 
 export function resolveNote(target: string, from: string, notes: NoteSource[]): NoteSource {
   const key = (value: string) => value.replace(/\.md$/i, '').normalize('NFC').toLowerCase();

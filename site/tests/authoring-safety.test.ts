@@ -119,3 +119,19 @@ test('heading wikilinks have visible labels and fragments that match rendered he
     assert.match(code, /<h2 id="its-fine">/);
   } finally { remove(); }
 });
+
+test('table wikilinks resolve escaped alias and image-size separators', async () => {
+  const { root, write, remove } = vault();
+  try {
+    write("I'll stay home.md", "---\ntitle: I'll stay home\n---\nHome.");
+    const renderer = await createMarkdownProcessor({ remarkPlugins: [[obsidianMarkdown, { root }]] });
+    const { code } = await renderer.render(String.raw`| Note | Image |
+| --- | --- |
+| [[I'll stay home\|A note]] | ![[images/cover #1.png\|120]] |
+| [[essays/Original name#A_b: 😃\|A heading]] | Text |`);
+    assert.match(code, /<table>/);
+    assert.match(code, /href="\/i&#x27;ll-stay-home">A note<\/a>/);
+    assert.match(code, /href="\/stable-address#a_b-">A heading<\/a>/);
+    assert.match(code, /src="\/images\/cover%20%231.png"[^>]*width="120"/);
+  } finally { remove(); }
+});
