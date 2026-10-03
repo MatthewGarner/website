@@ -78,3 +78,16 @@ Existing article paths and aliases were retained. RSS keeps the original apex-do
 Local drafts require Astro’s development watcher, a loopback-only server and no CI/Vercel environment. The loader controls the preview marker; a note cannot enable it through frontmatter. Published lists, RSS and the sitemap continue to use published notes only. Builds replace the content store, so cached draft previews cannot survive into output.
 
 The release tests create an isolated copy with draft notes, exercise their pages and saved edits, then build from the warmed cache and check for leaked paths or text. They also check that a hosted development environment excludes drafts. Test notes never enter the real Obsidian folder.
+
+## Dependency advisory assessment — 3 October 2026
+
+`npm --prefix site audit` reports [GHSA-ch52-4w7c-c8xp](https://github.com/advisories/GHSA-ch52-4w7c-c8xp)
+in `http-cache-semantics` 4.2.0 through Astro 7.3.5. No patched package is available.
+The flaw concerns shared caches serving another user's response after a client
+supplies `max-stale`. Astro uses this dependency for build-time remote-image cache
+lifetimes; this site uses local images and deploys static files without a server
+response cache or sessions. That leaves no identified exploit path here.
+
+Reassess when a patch appears or before introducing server rendering, authenticated
+fetches or shared response caching. Do not use `npm audit fix --force`: its proposed
+Astro 2 downgrade would remove the current publishing APIs, not safely fix this site.

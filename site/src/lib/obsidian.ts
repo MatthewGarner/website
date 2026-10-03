@@ -73,7 +73,9 @@ export function obsidianMarkdown({ root = CONTENT_DIR, includeDrafts = false } =
         const offset = match.index!;
         if (offset > cursor) parts.push({ type: 'text', value: node.value.slice(cursor, offset) });
         const [displayTarget, label] = match[2].split('|');
-        const target = original?.[2].split('|')[0] ?? displayTarget;
+        // Obsidian escapes the alias/size separator inside tables. Preserve raw
+        // filename punctuation, but do not treat that separator escape as a filename.
+        const target = original?.[2].replace(/\\\|/g, '|').split('|')[0] ?? displayTarget;
         if (match[1]) {
           if (/\.md(?:#|$)/i.test(target) || !path.extname(target)) throw new Error(`Note transclusion is not supported yet: ${target}`);
           const size = label?.match(/^(\d+)(?:x(\d+))?$/);

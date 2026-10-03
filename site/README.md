@@ -180,3 +180,5 @@ Do not hand-edit `site/dist/`, `site/.assets/`, `site/.astro/` or `.vercel/outpu
 behaviour. Tools vendors a versioned copy using its identity sync command; neither
 site fetches another site's assets at runtime. Appearance defaults to the OS, saves
 an override on this origin, and returns to the OS through the footer control.
+Update `src/identity/manifest.json` hashes whenever changing the shared files;
+Tools regenerates its own manifest when importing the snapshot.
