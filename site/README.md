@@ -7,13 +7,14 @@ The Astro app lives in `site/` and reads the original Markdown from `content/`. 
 Article tool blocks use `src/lib/tool-embeds.ts` for validated example manifests
 and Markdown rendering, and `src/scripts/tool-embeds.ts` for opt-in frames, theme
 messages and resizing. [Authoring examples](TOOL-ARTICLES.md) stay
-with the content. The Tools repo owns `/embed/v1/` and its frozen calculations;
-add a supported view to both registries before using it in writing. The website
+with the content. The Tools repo owns versioned `/embed/` routes and frozen
+calculations. Sync its released portable contract with `npm run sync:tool-contract
+-- /absolute/tools/embed/portable`; new tools need no per-tool website changes. The website
 build needs no checkout of Tools and never fetches tool code while building.
 With both local servers running as described in the authoring guide, run
 `node site/scripts/check-tool-embed.mjs` from the repository root to exercise the
-actual Flow demonstration in Chromium and WebKit. It checks the current-input
-handoff to Flow and writes desktop/phone screenshots to `site/test-results/tool-embed/`.
+legacy Flow and standard Flow, Rank and Knowledge demonstrations in Chromium and
+WebKit. It checks native full-tool handoffs and writes desktop/phone screenshots to `site/test-results/tool-embed/`.
 
 ## First setup
 

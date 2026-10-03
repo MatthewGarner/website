@@ -16,7 +16,8 @@
     "check:tool-examples": "node --import tsx scripts/check-tool-examples.ts",
     "check:hosted": "node --import tsx scripts/check-hosted.ts",
     "test": "node --import tsx --test tests/*.test.ts",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "sync:tool-contract": "node --import tsx scripts/sync-tool-contract.ts"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.1",

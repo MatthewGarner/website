@@ -10,6 +10,10 @@ const instances = [...document.querySelectorAll<HTMLElement>('[data-tool-src]')]
   const theme = () => frame?.contentWindow?.postMessage({ type: 'mg-tool:theme', version: 1,
     theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light' }, src.origin);
   const stop = () => { clearTimeout(timeout); frame?.remove(); frame = null; delete figure.dataset.toolState; };
+  const failed = () => {
+    stop(); button.textContent = 'Try interactive example';
+    status.textContent = 'The interactive example could not load. The illustration and full tool link are still available.';
+  };
   button.hidden = false;
   button.addEventListener('click', () => {
     if (frame) {
@@ -26,13 +30,11 @@ const instances = [...document.querySelectorAll<HTMLElement>('[data-tool-src]')]
     frame.addEventListener('load', theme);
     stage.append(frame);
     // iframe load also fires on CSP/network failure. Only the ready handshake replaces the figure.
-    timeout = window.setTimeout(() => {
-      stop(); button.textContent = 'Try interactive example';
-      status.textContent = 'The interactive example could not load. The illustration and full tool link are still available.';
-    }, 10_000);
+    timeout = window.setTimeout(failed, 10_000);
   });
   return { theme, receive(event: MessageEvent) {
     if (!frame || event.source !== frame.contentWindow || event.origin !== src.origin || event.data?.version !== 1) return;
+    if (event.data.type === 'mg-tool:error') { failed(); return; }
     if (event.data.type === 'mg-tool:ready') {
       clearTimeout(timeout); figure.dataset.toolState = 'ready';
       button.textContent = 'Show illustration'; status.textContent = ''; theme();
