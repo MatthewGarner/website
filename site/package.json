@@ -39,8 +39,8 @@
     "@playwright/test": "1.63.0",
     "@types/fontkit": "2.0.9",
     "@types/mdast": "4.0.4",
-    "@types/node": "24.19.0",
+    "@types/node": "26.6.2",
     "tsx": "4.23.15",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   }
 }
