@@ -22,9 +22,11 @@ test('two article figures load independently, match appearance and restore their
   await expect(figures.first().locator('iframe')).toHaveCSS('height', '320px');
   await expect(figures.first().locator('.tool-demo-poster')).not.toBeVisible();
   await expect(figures.last().locator('.tool-demo-poster')).toBeVisible();
+  const theme = await page.locator('html').getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   await page.locator('button.appearance').click();
-  const theme = await page.locator('html').getAttribute('data-theme');
-  await expect(page.frameLocator('iframe').locator('html')).toHaveAttribute('data-theme', theme!);
+  // View transitions apply the theme asynchronously; reading immediately after click can capture the old value.
+  await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+  await expect(page.frameLocator('iframe').locator('html')).toHaveAttribute('data-theme', theme);
   // Messages from another window may not hide figures or resize their frames.
   await page.evaluate(() => window.postMessage({ type: 'mg-tool:resize', version: 1, height: 1200 }, location.origin));
   await expect(figures.first().locator('iframe')).toHaveCSS('height', '320px');
