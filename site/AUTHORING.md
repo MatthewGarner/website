@@ -122,6 +122,24 @@ The first form supplies descriptive alternative text and a visible caption. The 
 
 Text inside `%% editing comments %%` is removed from the generated pages, previews and feed. Close both markers: an unfinished comment stops the build. Markers inside code examples remain literal.
 
+## Tool demonstrations
+
+Use a named example between paragraphs:
+
+````markdown
+```tool
+example: flow-queues-v1
+caption: Increase demand towards capacity. What happens to waiting?
+```
+````
+
+The default is an interactive figure; add `mode: figure` for a saved illustration
+and full-tool link. Only Flow v1's waiting-time view is currently supported.
+
+Follow [Writing with tool demonstrations](TOOL-ARTICLES.md) for the complete
+workflow: new article, custom inputs, matching image generation, allowed controls,
+local and hosted previews, validation, publishing and adding another tool adapter.
+
 ## Keep published addresses stable
 
 `Small observations.md` normally becomes `/small-observations`. Changing its title property leaves that address alone; renaming or moving the file can change it. Before moving a published file, set `slug` to its existing URL path without the leading slash.

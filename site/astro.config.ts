@@ -6,12 +6,15 @@ import path from 'node:path';
 import rehypeSlug from 'rehype-slug';
 import { obsidianMarkdown } from './src/lib/obsidian';
 import { readingProse } from './src/lib/prose';
+import { articleTools } from './src/lib/tool-embeds';
 import { CONTENT_DIR, contentFiles, assetExtensions, noteSources, safeSlug, noteHref } from './src/lib/publishing';
 import { localDraftsEnabled } from './src/lib/drafts';
 import { isPersonalPage } from './src/lib/personal-pages';
 
 const markdownProcessor = (includeDrafts = false) => unified({
-  remarkPlugins: [[obsidianMarkdown, { includeDrafts }]], rehypePlugins: [rehypeSlug, readingProse],
+  remarkPlugins: [[obsidianMarkdown, { includeDrafts }], [articleTools, {
+    ...(includeDrafts && process.env.TOOL_EMBED_ORIGIN ? { origin: process.env.TOOL_EMBED_ORIGIN } : {}),
+  }]], rehypePlugins: [rehypeSlug, readingProse],
 });
 
 const assetDir = path.join(import.meta.dirname, '.assets');

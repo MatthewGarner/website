@@ -6,6 +6,7 @@ import arrowLeft from '@phosphor-icons/core/assets/regular/arrow-left.svg?raw';
 import Footnotes from '../components/Footnotes.astro';
 import QuotePassage from '../components/QuotePassage.astro';
 import ReadingDetails from '../components/ReadingDetails.astro';
+import ToolEmbeds from '../components/ToolEmbeds.astro';
 import NowPage from '../components/NowPage.astro';
 import BookshelfPage from '../components/BookshelfPage.astro';
 import { isPersonalPage } from '../lib/personal-pages';
@@ -30,6 +31,7 @@ const personalPage = isPersonalPage(note.id);
       <p class="essay-meta"><span class="writing-type">{writingType(note)}</span>{note.data.date && <time datetime={note.data.date.toISOString()}>{longDate(note.data.date)}</time>}<span>{readingMinutes(note)} min read</span></p>
     </header>
     <div class="prose"><Content /></div>
+    <ToolEmbeds />
     <Footnotes />
     <QuotePassage title={note.data.title} path={noteHref(note.id)} localDraft={isLocalDraft(note)} />
     <ReadingDetails>

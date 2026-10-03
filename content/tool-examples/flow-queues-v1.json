@@ -1,0 +1,12 @@
+{
+  "tool": "flow",
+  "version": 1,
+  "view": "waiting-time",
+  "title": "Demand and waiting time",
+  "summary": "Increase demand while capacity stays fixed. Watch the queue grow as spare capacity disappears.",
+  "image": "/images/demonstrations/flow-queues-v1.svg",
+  "alt": "A queue simulation plots average waiting against demand. At 8 items per week, average waiting is about 1 working day. Waiting increases sharply near the capacity of 10 items per week; at capacity there is no stable waiting-time estimate.",
+  "params": { "demandPerWeek": 8, "itemDays": 2, "team": 4, "wipLimit": 4, "cov": "med" },
+  "seed": 61709,
+  "controls": ["demand"]
+}

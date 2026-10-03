@@ -13,6 +13,7 @@
     "build:release": "npm run check && npm run build && npm test && node --import tsx scripts/package-vercel.ts --root",
     "preview": "astro preview",
     "check": "astro check",
+    "check:tool-examples": "node --import tsx scripts/check-tool-examples.ts",
     "check:hosted": "node --import tsx scripts/check-hosted.ts",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:browser": "playwright test"

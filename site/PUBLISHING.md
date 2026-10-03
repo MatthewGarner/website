@@ -18,6 +18,9 @@ All commands below run from the repository folder, not inside `site/`. Replace e
    If you already have uncommitted work, keep it; commit it on its current branch or resolve it before switching. If Git reports conflicts, resolve them before publishing rather than forcing a push.
 
 2. Edit the Markdown in `content/`. For a new piece, set `draft: false` and remove `publish: false` if present. Include any images it needs. [Property reference](AUTHORING.md#properties).
+   For tool demonstrations, include the example JSON and its matching image too;
+   follow the [tool article workflow](TOOL-ARTICLES.md#publish). Deploy a new Tools
+   adapter before publishing an article that needs it.
 3. Check the piece locally and run the release checks:
 
    ```sh

@@ -1,0 +1,25 @@
+<script>
+  import '../scripts/tool-embeds';
+</script>
+<style is:global>
+  .prose .tool-demo { padding: 20px 0; border-block: 1px solid var(--line); }
+  .tool-demo-stage { position: relative; }
+  .tool-demo-poster { width: 100%; }
+  .tool-demo iframe { display: block; width: 100%; border: 0; height: 560px; color-scheme: normal; }
+  .tool-demo:not([data-tool-state='ready']) iframe { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
+  .tool-demo[data-tool-state='ready'] .tool-demo-poster { display: none; }
+  /* The live frame owns the current-input link; the static link opens the original example. */
+  .tool-demo[data-tool-state='ready'] .tool-demo-actions a { display: none; }
+  .prose .tool-demo figcaption { text-align: left; }
+  .tool-demo-actions { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; margin-top: 16px; font-size: 17px; }
+  .tool-demo-actions button { min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; }
+  .tool-demo-actions a { display: inline-flex; align-items: center; min-height: 44px; gap: 6px; }
+  .prose .tool-demo-status { font-size: 17px; color: var(--muted); margin: 8px 0 0; }
+  .tool-demo-status:empty { display: none; }
+  @media print {
+    .tool-demo iframe, .tool-demo-actions button, .tool-demo-status { display: none !important; }
+    .tool-demo .tool-demo-poster { display: block !important; }
+    .tool-demo .tool-demo-actions a { display: inline-flex !important; }
+    .prose .tool-demo { break-inside: avoid; }
+  }
+</style>
