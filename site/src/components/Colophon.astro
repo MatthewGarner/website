@@ -11,9 +11,16 @@
     <div class="type-playground">
       <div class="type-sheet" data-paper="cream" data-face="oswald">
         <div class="type-sheet-content">
-        <div class="specimen-caption"><span data-face-name>Oswald</span><span>Type specimen · 01</span></div>
+        <div class="specimen-caption"><span data-face-name>Oswald</span><span data-specimen-caption>Type specimen · 01</span></div>
         <label for="specimen-text" class="sr-only">Your words</label>
         <textarea id="specimen-text" maxlength="72" rows="3" spellcheck="false" autocomplete="off" aria-describedby="specimen-hint">{'A little\nroom to think.'}</textarea>
+        <section class="guide-entry" aria-label="The Guide, entry 42" hidden>
+          <p class="guide-reassurance">DON’T PANIC.</p>
+          <p class="guide-subject">Matthew Garner’s corner of the internet</p>
+          <p class="guide-verdict">Mostly harmless.<br />Occasionally useful.</p>
+          <p class="guide-location">Sol system / Earth / You are here</p>
+          <button type="button" data-close-guide>Back to the specimen <span aria-hidden="true">↶</span></button>
+        </section>
         <p id="specimen-hint">Try typing something of your own.</p>
         </div>
       </div>
@@ -59,7 +66,10 @@
   const weight = details.querySelector<HTMLInputElement>('#specimen-weight')!;
   const weightValue = details.querySelector<HTMLOutputElement>('#specimen-weight-value')!;
   const faceName = details.querySelector<HTMLElement>('[data-face-name]')!;
+  const caption = details.querySelector<HTMLElement>('[data-specimen-caption]')!;
   const status = details.querySelector<HTMLElement>('[data-specimen-status]')!;
+  const guide = details.querySelector<HTMLElement>('.guide-entry')!;
+  const hint = details.querySelector<HTMLElement>('#specimen-hint')!;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let folds: Animation[] = [];
   let specimenAnimation: Animation | undefined;
@@ -69,6 +79,30 @@
   let openingByReader = false;
   let focusWasInside = false;
   let operation = 0;
+
+  function updateGuide() {
+    const revealed = specimen.value.trim() === '42';
+    if (revealed === !guide.hidden) return;
+    // Settle an opening fold before the specimen's height changes.
+    if (folds.length) finishFold();
+    guide.hidden = !revealed;
+    sheet.toggleAttribute('data-guide', revealed);
+    faceName.textContent = revealed ? 'The Guide' : sheet.dataset.face === 'oswald' ? 'Oswald' : 'Newsreader';
+    caption.textContent = revealed ? 'Entry · 0042' : 'Type specimen · 01';
+    hint.textContent = revealed ? 'The answer was here all along.' : 'Try typing something of your own.';
+    if (revealed) {
+      status.textContent = 'The Guide, entry 42. Don’t panic. Mostly harmless. Occasionally useful.';
+      revealSpecimen();
+    }
+  }
+  specimen.addEventListener('input', (event) => { if (!(event as InputEvent).isComposing) updateGuide(); });
+  specimen.addEventListener('compositionend', updateGuide);
+  details.querySelector('[data-close-guide]')!.addEventListener('click', () => {
+    specimen.value = phrases[phrase];
+    updateGuide();
+    specimen.focus({ preventScroll: true });
+    status.textContent = 'Back to the specimen.';
+  });
 
   function stopSpecimen() {
     specimenAnimation?.cancel();
@@ -188,19 +222,21 @@
   });
   details.querySelectorAll<HTMLInputElement>('input[name="specimen-face"]').forEach(input => input.addEventListener('change', () => {
     sheet.dataset.face = input.value;
-    faceName.textContent = input.value === 'oswald' ? 'Oswald' : 'Newsreader';
+    faceName.textContent = guide.hidden ? input.value === 'oswald' ? 'Oswald' : 'Newsreader' : 'The Guide';
     revealSpecimen();
   }));
   details.querySelectorAll<HTMLInputElement>('input[name="specimen-paper"]').forEach(input => input.addEventListener('change', () => { sheet.dataset.paper = input.value; }));
   details.querySelector('[data-next-phrase]')!.addEventListener('click', () => {
     phrase = (phrase + 1) % phrases.length;
     specimen.value = phrases[phrase];
+    updateGuide();
     status.textContent = `New phrase: ${phrases[phrase].replace('\n', ' ')}`;
     revealSpecimen();
   });
   details.querySelector('[data-reset-type]')!.addEventListener('click', () => {
     phrase = 0;
     specimen.value = phrases[0];
+    updateGuide();
     specimen.style.removeProperty('font-weight');
     weight.value = weightValue.value = '600';
     sheet.dataset.face = 'oswald';
@@ -211,7 +247,7 @@
     revealSpecimen();
   });
   // Safari does not focus buttons on click. Keep subsequent Escape/Tab inside the disclosure.
-  details.querySelectorAll<HTMLButtonElement>('button').forEach(button => button.addEventListener('click', () => button.focus({ preventScroll: true })));
+  details.querySelectorAll<HTMLButtonElement>('.type-controls button').forEach(button => button.addEventListener('click', () => button.focus({ preventScroll: true })));
   function settle() {
     stopSpecimen();
     finishFold();
@@ -247,6 +283,14 @@
   #specimen-text:focus-visible { outline-color: var(--specimen-ink); }
   #specimen-text::selection { background: var(--specimen-ink); color: var(--specimen-paper); }
   [data-face='newsreader'] #specimen-text { font-family: var(--serif); font-optical-sizing: auto; }
+  [data-guide] #specimen-text { height: 64px; font-size: 52px; resize: none; }
+  .guide-entry { border-top: 1px solid currentColor; margin-top: 16px; padding-top: 18px; animation: guide-arrival 420ms ease both; }
+  .guide-reassurance { font: 600 clamp(34px, 4vw, 48px)/1.1 var(--display); letter-spacing: -.02em; }
+  .guide-subject { margin-top: 18px; font: 14px/1.4 ui-monospace, monospace; }
+  .guide-verdict { margin-top: 12px; font: 26px/1.15 var(--serif); }
+  .guide-location { margin-top: 24px; font: 11px/1.5 ui-monospace, monospace; letter-spacing: .03em; text-transform: uppercase; }
+  [data-close-guide] { min-height: 44px; margin-top: 12px; padding: 8px 0; border: 0; background: none; color: inherit; font: 16px/1.4 var(--serif); text-decoration: underline; text-underline-offset: 5px; }
+  @keyframes guide-arrival { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   #specimen-hint { margin-top: 24px; font: 14px/1.4 var(--serif); }
   .type-controls { display: grid; gap: 24px; padding-top: 2px; min-width: 0; }
   .type-controls fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
