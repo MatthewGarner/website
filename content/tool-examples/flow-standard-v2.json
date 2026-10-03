@@ -1,0 +1,19 @@
+{
+  "tool": "flow",
+  "version": 2,
+  "view": "queue",
+  "state": {
+    "d": 8,
+    "s": 2,
+    "t": 4,
+    "w": 4,
+    "v": "med"
+  },
+  "controls": [
+    "demand"
+  ],
+  "title": "Flow — Queue and waiting",
+  "summary": "The average item takes 3 days — 2 days working, 1 day waiting. Fixed-seed illustrative simulation.",
+  "image": "/assets/tool-examples/flow-standard-v2.png",
+  "alt": "The average item takes 3 days — 2 days working, 1 day waiting. Fixed-seed illustrative simulation."
+}

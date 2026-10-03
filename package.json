@@ -19,6 +19,7 @@
     "check:tool-examples": "npm --prefix site run check:tool-examples",
     "check:hosted": "npm --prefix site run check:hosted --",
     "test": "npm --prefix site test",
-    "test:browser": "npm --prefix site run test:browser --"
+    "test:browser": "npm --prefix site run test:browser --",
+    "sync:tool-contract": "npm --prefix site run sync:tool-contract --"
   }
 }

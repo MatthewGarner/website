@@ -134,11 +134,12 @@ caption: Increase demand towards capacity. What happens to waiting?
 ````
 
 The default is an interactive figure; add `mode: figure` for a saved illustration
-and full-tool link. Only Flow v1's waiting-time view is currently supported.
+and full-tool link. Choose any released tool/view in the local catalogue; new tools
+need a catalogue sync, not website code changes.
 
 Follow [Writing with tool demonstrations](TOOL-ARTICLES.md) for the complete
-workflow: new article, custom inputs, matching image generation, allowed controls,
-local and hosted previews, validation, publishing and adding another tool adapter.
+workflow: choosing a released tool/view, creating an example, matching image
+generation, allowed controls, local and hosted previews, validation and publishing.
 
 ## Keep published addresses stable
 

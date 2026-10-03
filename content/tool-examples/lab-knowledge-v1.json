@@ -1,0 +1,123 @@
+{
+  "tool": "lab-knowledge",
+  "version": 1,
+  "view": "coaching",
+  "state": {
+    "version": 2,
+    "skills": [
+      [
+        1,
+        0.15,
+        0.25
+      ],
+      [
+        0.2,
+        1,
+        0.15
+      ],
+      [
+        0.2,
+        0.2,
+        1
+      ],
+      [
+        0.45,
+        0.35,
+        0.35
+      ]
+    ],
+    "sessions": [
+      {
+        "enabled": true,
+        "mentor": 1,
+        "learner": 3,
+        "skill": 1,
+        "start": 2,
+        "duration": 6,
+        "fraction": 0.35,
+        "id": "first"
+      }
+    ],
+    "selected": "first",
+    "focus": [
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    "absences": [
+      {
+        "person": 1,
+        "from": 12,
+        "to": 24,
+        "id": "away"
+      }
+    ],
+    "scenario": "battery",
+    "workload": {
+      "before": [
+        0.35,
+        1.55,
+        1.4
+      ],
+      "after": [
+        0.35,
+        1.55,
+        1.4
+      ],
+      "changeWeek": 25
+    },
+    "week": 12,
+    "baseline": {
+      "skills": [
+        [
+          1,
+          0.15,
+          0.25
+        ],
+        [
+          0.2,
+          1,
+          0.15
+        ],
+        [
+          0.2,
+          0.2,
+          1
+        ],
+        [
+          0.45,
+          0.35,
+          0.35
+        ]
+      ],
+      "sessions": [
+        {
+          "enabled": true,
+          "mentor": 1,
+          "learner": 3,
+          "skill": 1,
+          "start": 2,
+          "duration": 6,
+          "fraction": 0.35,
+          "id": "first"
+        }
+      ],
+      "focus": [
+        -1,
+        -1,
+        -1,
+        -1
+      ]
+    },
+    "decision": ""
+  },
+  "controls": [
+    "start",
+    "absence"
+  ],
+  "title": "Specialists and shared knowledge — Coaching and queues",
+  "summary": "After 24 weeks: 64.3 completed, 14.6 waiting, 4.2 person-weeks coaching.",
+  "image": "/assets/tool-examples/lab-knowledge-v1.png",
+  "alt": "After 24 weeks: 64.3 completed, 14.6 waiting, 4.2 person-weeks coaching."
+}

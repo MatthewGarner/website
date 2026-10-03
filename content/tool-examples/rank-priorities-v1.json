@@ -1,0 +1,73 @@
+{
+  "tool": "rank",
+  "version": 1,
+  "view": "ranking",
+  "state": {
+    "c": [
+      [
+        "Value",
+        3
+      ],
+      [
+        "Time criticality",
+        2
+      ],
+      [
+        "Risk reduction",
+        1
+      ]
+    ],
+    "e": [
+      "Effort",
+      1
+    ],
+    "i": [
+      [
+        "Resume position",
+        8,
+        8,
+        6,
+        4
+      ],
+      [
+        "Reading reminders",
+        7,
+        6,
+        5,
+        4
+      ],
+      [
+        "Home widget",
+        9,
+        3,
+        5,
+        5
+      ],
+      [
+        "Club challenges",
+        5,
+        9,
+        4,
+        5
+      ],
+      [
+        "Onboarding redesign",
+        4,
+        3,
+        6,
+        7
+      ]
+    ],
+    "k": 3,
+    "w": 50,
+    "s": 1
+  },
+  "controls": [
+    "value",
+    "wobble"
+  ],
+  "title": "Rank — Priority stability",
+  "summary": "2 of the top 3 are settled. Resume position, Reading reminders make the cut under any reasonable weights. The remaining 1 place is a genuine tie between Home widget, Club challenges — the framework can’t decide it, so decide it on strategy or sequencing. Illustrative uncertainty in stated scores and weights.",
+  "image": "/assets/tool-examples/rank-priorities-v1.png",
+  "alt": "2 of the top 3 are settled. Resume position, Reading reminders make the cut under any reasonable weights. The remaining 1 place is a genuine tie between Home widget, Club challenges — the framework can’t decide it, so decide it on strategy or sequencing. Illustrative uncertainty in stated scores and weights."
+}

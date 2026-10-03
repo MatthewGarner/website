@@ -64,3 +64,24 @@ test('without JavaScript the illustration, caption and model link still work', a
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await context.close();
 });
+
+
+test('a child failure immediately restores the illustration and can be retried independently', async ({ page }) => {
+  let attempts = 0;
+  await page.route('https://tools.matthewgarner.me/embed/**', route => {
+    attempts++;
+    return route.fulfill({ contentType: 'text/html', body: attempts === 1 ? `<!doctype html><script>
+      parent.postMessage({type:'mg-tool:error',version:1,message:'<b>untrusted</b>'},new URL(location.href).searchParams.get('parent'));
+      </script>` : child });
+  });
+  await page.goto('/tool-embed-sample');
+  const figure = page.locator('.tool-demo').first();
+  await figure.getByRole('button').click();
+  await expect(figure.getByRole('status')).toContainText('could not load');
+  await expect(figure.getByRole('status')).not.toContainText('untrusted');
+  await expect(figure.locator('iframe')).toHaveCount(0);
+  await expect(figure.locator('.tool-demo-poster')).toBeVisible();
+  await figure.getByRole('button', { name: 'Try interactive example' }).click();
+  await expect(figure).toHaveAttribute('data-tool-state', 'ready');
+  await expect(page.locator('.tool-demo').last().locator('.tool-demo-poster')).toBeVisible();
+});
