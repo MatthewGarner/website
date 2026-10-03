@@ -144,6 +144,8 @@ Navigation, article titles and footer links draw an underline on hover or keyboa
 
 **About this site** in the footer unfolds a small typography playground: the paper opens before its words and controls appear, then folds back on closing. Repeated clicks reverse the movement; entering the editor settles it immediately. Readers can edit the specimen, choose Oswald or Newsreader, adjust its weight and change its paper colour. **Another phrase** cycles the phrases defined in `Colophon.astro`; **Reset** restores the defaults. These changes stay within the specimen and are neither saved nor sent anywhere. Escape closes the panel and returns focus to its heading. Without JavaScript, the site note and editable specimen still work; reduced motion removes the effects.
 
+Two small discoveries: typing exactly `42` in the specimen reveals a Guide entry; editing the number, **Back to the specimen**, **Another phrase** or **Reset** returns to ordinary type. On the 404, **Give it a tug** untangles a thread into a Home link; the thread can be wound back up. Both support keyboard input and reduced motion. The thread lives in `src/components/LooseEnd.astro` and disappears without JavaScript, leaving the usual reading link.
+
 ### Reading interactions and browser checks
 
 Opening featured writing carries its title into the article in browsers with native page transitions. Footnotes open beside the reference; Escape or Close returns focus. Selecting prose offers **Copy quote & link**, with a manual copy field if clipboard access is unavailable. These enhancements need no extra Markdown properties. Plain navigation and footnote links remain available without JavaScript or the relevant browser feature; reduced motion skips animation.
@@ -156,6 +158,8 @@ npm run test:browser
 ```
 
 The suite builds an isolated copy with the reading sample, never adding fixtures to `content/`. It checks keyboard and touch controls, reduced motion, missing features, blocked storage and clipboard access, light/dark contrast, and print output in Chromium and WebKit. GitHub runs it automatically. Print screenshots and the Chromium PDF are written under `site/test-results/`; failed runs retain traces. Physical devices and screen-reader use still benefit from occasional manual checks.
+
+The suite reserves port 4335. If it is occupied, check which checkout owns the process before stopping anything; reusing another worktree’s fixture would test its built pages instead of this checkout.
 
 Interaction code lives in `src/components/HomeArrival.astro`, `ResponsiveHeadline.astro`, `ReadingTransition.astro`, `ReadingDetails.astro`, `Footnotes.astro`, `QuotePassage.astro` and `Colophon.astro`, plus `src/scripts/previews.ts` and `src/identity/appearance.js`. Link effects, print and shared motion rules live in `src/styles/global.css`.
 

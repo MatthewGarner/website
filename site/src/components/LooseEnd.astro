@@ -1,0 +1,72 @@
+<div class="loose-end" data-loose-end hidden>
+  <svg viewBox="0 0 480 180" fill="none" aria-hidden="true">
+    <path class="thread" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M24 12 C24 48 106 26 106 68 C106 112 40 118 48 76 C56 34 140 58 116 104 C98 140 76 115 76 150" />
+    <circle class="thread-tip" cx="416" cy="150" r="3" fill="currentColor" />
+  </svg>
+  <button type="button" class="thread-tug" aria-expanded="false" aria-controls="thread-home">Give it a tug<span aria-hidden="true"> ↓</span></button>
+  <a id="thread-home" class="thread-home" href="/" hidden>Home <span aria-hidden="true">↗</span></a>
+  <p class="sr-only" role="status" data-thread-status></p>
+</div>
+<script>
+  const end = document.querySelector<HTMLElement>('[data-loose-end]')!;
+  const thread = end.querySelector<SVGPathElement>('.thread')!;
+  const tug = end.querySelector<HTMLButtonElement>('.thread-tug')!;
+  const home = end.querySelector<HTMLAnchorElement>('.thread-home')!;
+  const status = end.querySelector<HTMLElement>('[data-thread-status]')!;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  // Matching control points let the knot loosen continuously in Safari as well as Chromium.
+  const knotted = [24,12, 24,48,106,26,106,68, 106,112,40,118,48,76, 56,34,140,58,116,104, 98,140,76,115,76,150];
+  const unwound = [24,12, 24,50,76,38,100,70, 132,114,166,44,226,78, 288,114,262,152,328,140, 366,134,388,150,416,150];
+  let opened = false;
+  let progress = 0;
+  let frame = 0;
+  function draw(value: number) {
+    progress = value;
+    const points = knotted.map((point, i) => point + (unwound[i] - point) * value);
+    thread.setAttribute('d', `M${points.slice(0, 2).join(' ')} C${points.slice(2).join(' ')}`);
+  }
+  function settle() {
+    cancelAnimationFrame(frame);
+    draw(opened ? 1 : 0);
+    end.classList.toggle('is-unwound', opened);
+  }
+  tug.addEventListener('click', () => {
+    opened = !opened;
+    tug.setAttribute('aria-expanded', String(opened));
+    tug.innerHTML = opened ? 'Wind it back up<span aria-hidden="true"> ↶</span>' : 'Give it a tug<span aria-hidden="true"> ↓</span>';
+    home.hidden = !opened;
+    status.textContent = opened ? 'There you are. A way home.' : '';
+    cancelAnimationFrame(frame);
+    end.classList.toggle('is-unwound', opened);
+    if (motion.matches) { settle(); return; }
+    const from = progress;
+    const to = opened ? 1 : 0;
+    const start = performance.now();
+    function unwind(now: number) {
+      const elapsed = Math.min(1, (now - start) / 850);
+      const eased = elapsed < .5 ? 4 * elapsed ** 3 : 1 - (-2 * elapsed + 2) ** 3 / 2;
+      draw(from + (to - from) * eased);
+      if (elapsed < 1) frame = requestAnimationFrame(unwind);
+    }
+    frame = requestAnimationFrame(unwind);
+  });
+  motion.addEventListener('change', () => { if (motion.matches) settle(); });
+  addEventListener('pagehide', settle);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) settle(); });
+  end.hidden = false;
+</script>
+<style>
+  .loose-end { position: relative; width: min(100%, 480px); margin: 28px 0 24px; padding-bottom: 48px; color: var(--accent); }
+  .loose-end svg { display: block; width: 100%; overflow: visible; }
+  .thread-tip { opacity: 0; transition: opacity 180ms; }
+  .is-unwound .thread-tip { opacity: 1; transition-delay: 700ms; }
+  .thread-tug, .thread-home { min-height: 44px; padding: 10px 0; font: 18px/1.4 var(--serif); }
+  .thread-tug { position: absolute; bottom: 0; left: 6%; border: 0; background: none; color: var(--muted); }
+  .thread-tug:hover { color: var(--accent); }
+  .thread-tug span { display: inline-block; margin-left: 6px; }
+  .thread-home { position: absolute; right: 7%; bottom: 0; text-decoration: underline; text-underline-offset: 5px; animation: find-home 850ms both; }
+  /* Keyboard navigation must never land on an invisible, still-arriving link. */
+  .thread-home:focus-visible { animation: none; }
+  @keyframes find-home { 0%, 65% { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @media print { .loose-end { display: none; } }
+</style>
