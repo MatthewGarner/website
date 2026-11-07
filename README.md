@@ -19,7 +19,7 @@ Keep `draft: true` while writing. Drafts appear under **Local drafts** on the lo
 
 ## Start a local preview
 
-Use Node.js 24. Run these commands from the repository folder (`/Users/matthew/repos/website` on this Mac):
+Use Node.js 26. Run these commands from the repository folder (`/Users/matthew/repos/website` on this Mac):
 
 ```sh
 npm ci

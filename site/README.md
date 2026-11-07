@@ -18,14 +18,14 @@ WebKit. It checks native full-tool handoffs and writes desktop/phone screenshots
 
 ## First setup
 
-You need Git and **Node.js 24**, which includes npm. Check your installation:
+You need Git and **Node.js 26**, which includes npm. Check your installation:
 
 ```sh
 node --version
 npm --version
 ```
 
-Node should report `v24…`. If you use nvm, run `nvm use` from the repository root to select the version in `.nvmrc`.
+Node should report `v26…`. If you use nvm, run `nvm use` from the repository root to select the version in `.nvmrc`.
 
 Install the app’s dependencies:
 
@@ -175,7 +175,7 @@ Do not hand-edit `site/dist/`, `site/.assets/`, `site/.astro/` or `.vercel/outpu
 | Missing or ambiguous note link / attachment | Check the target spelling and path, whether it is published, and whether two notes or images have the same name. |
 | Duplicate or reserved path / conflicting alias | Give the piece and its aliases unique paths. `about`, `writing`, `404`, `index.xml` and `sitemap.xml` are reserved. |
 | Tests cannot find built pages | Run `build:release`, which builds before testing. |
-| Node or dependency errors | Use Node 24 and rerun `npm ci`. |
+| Node or dependency errors | Use Node 26 and rerun `npm ci`. |
 | Preview exits before starting, or a local request reports `EPERM` | A restricted execution environment can block listening on or connecting to a local port. Allow local-server access there, or run the command in your normal terminal. |
 | A Git push succeeds but the live site stays old | Check the branch and the Vercel build log. Only `v5` publishes production; an errored build leaves the previous site live. |
 

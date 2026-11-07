@@ -13,7 +13,7 @@ The site is hosted on Vercel at [www.matthewgarner.me](https://www.matthewgarner
 | Vercel project | [matthew-garners-projects/my-web-quartz](https://vercel.com/matthew-garners-projects/my-web-quartz) |
 | Project ID | `prj_8vVA6l6X8f3iSH5QqGmLr7oe9fuj` |
 | Project root | Repository root |
-| Node version | 24 |
+| Node version | 26 |
 | Install command | `npm ci` |
 | Build command | `npm run build:release` |
 
