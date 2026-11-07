@@ -8,7 +8,7 @@ version, starting state, view and controls. The catalogue records the available
 views, input schema, `initialState` and each view's `defaultControls`.
 
 Articles live in this repository's `content/`. The separate **Matt** Obsidian vault
-holds planning notes and does not publish automatically. Use Node 24 and keep
+holds planning notes and does not publish automatically. Use Node 26 and keep
 unfinished articles as `draft: true`.
 
 ## Create the example and matching illustration
